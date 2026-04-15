@@ -6,81 +6,21 @@
   <title>Cadastro de Estabelecimento</title>
   <link rel="stylesheet" href="estilo.css">
   <style>
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-      border-bottom: 1px solid #ddd;
-    }
-    .tab-btn {
-      padding: 8px 16px;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      font-weight: 600;
-      border-bottom: 3px solid transparent;
-    }
-    .tab-btn.ativo {
-      border-bottom-color: #1a73e8;
-      color: #1a73e8;
-    }
-    .tab-conteudo {
-      display: none;
-    }
-    .tab-conteudo.ativo {
-      display: block;
-    }
-    table.listagem {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 8px;
-      font-size: 14px;
-    }
-    table.listagem th, table.listagem td {
-      border: 1px solid #eee;
-      padding: 6px 8px;
-      text-align: left;
-    }
-    table.listagem th {
-      background: #f5f5f5;
-    }
-    table.listagem tr:hover {
-      background: #f0f7ff;
-      cursor: pointer;
-    }
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 11px;
-      background: #eee;
-    }
-    .badge-status {
-      background: #e3f2fd;
-      color: #1a73e8;
-    }
-    .badge-cidade {
-      background: #f1f8e9;
-      color: #558b2f;
-    }
-    .info-edicao {
-      font-size: 12px;
-      color: #555;
-      margin-bottom: 8px;
-    }
-    .info-edicao span {
-      font-weight: 600;
-    }
-    .btn-secundario {
-      background: #fff;
-      color: #1a73e8;
-      border: 1px solid #1a73e8;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 13px;
-      margin-left: 8px;
-    }
+    .tabs { display:flex; gap:8px; margin-bottom:16px; border-bottom:1px solid #ddd; }
+    .tab-btn { padding:8px 16px; border:none; background:transparent; cursor:pointer; font-weight:600; border-bottom:3px solid transparent; font-size:14px; }
+    .tab-btn.ativo { border-bottom-color:#1a73e8; color:#1a73e8; }
+    .tab-conteudo { display:none; }
+    .tab-conteudo.ativo { display:block; }
+    table.listagem { width:100%; border-collapse:collapse; margin-top:8px; font-size:14px; }
+    table.listagem th, table.listagem td { border:1px solid #eee; padding:6px 8px; text-align:left; }
+    table.listagem th { background:#f5f5f5; }
+    table.listagem tr:hover { background:#f0f7ff; cursor:pointer; }
+    .badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; background:#eee; }
+    .badge-status { background:#e3f2fd; color:#1a73e8; }
+    .badge-cidade { background:#f1f8e9; color:#558b2f; }
+    .info-edicao { font-size:13px; color:#555; margin-bottom:12px; background:#fff8e1; border:1px solid #ffe082; border-radius:6px; padding:8px 12px; }
+    .info-edicao span { font-weight:600; color:#333; }
+    .btn-secundario { background:#fff; color:#1a73e8; border:1px solid #1a73e8; padding:5px 12px; border-radius:4px; cursor:pointer; font-size:13px; margin-left:8px; }
   </style>
 </head>
 <body>
@@ -101,11 +41,12 @@
 
   <div id="alerta" class="alerta"></div>
 
-  <!-- Aba Novo Cadastro -->
+  <!-- ═══ ABA NOVO CADASTRO ═══ -->
   <div id="tab-novo" class="tab-conteudo ativo">
+
     <div id="infoEdicao" class="info-edicao" style="display:none;">
-      Editando estabelecimento <span id="infoEdicaoNome"></span> (ID: <span id="infoEdicaoId"></span>).
-      <button type="button" class="btn-secundario" onclick="cancelarEdicao()">Cancelar edição</button>
+      Editando: <span id="infoEdicaoNome"></span> &nbsp;|&nbsp; ID: <span id="infoEdicaoId"></span>
+      <button type="button" class="btn-secundario" onclick="cancelarEdicao()">✕ Cancelar edição</button>
     </div>
 
     <form id="formCadastro">
@@ -125,11 +66,11 @@
             <label>CNPJ <span class="opcional">(opcional)</span></label>
             <input type="text" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18"
               oninput="
-                var v = this.value.replace(/\D/g,'').substring(0,14);
-                if(v.length>12) v=v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,'$1.$2.$3/$4-$5');
-                else if(v.length>8) v=v.replace(/^(\d{2})(\d{3})(\d{3})(\d+)$/,'$1.$2.$3/$4');
-                else if(v.length>5) v=v.replace(/^(\d{2})(\d{3})(\d+)$/,'$1.$2.$3');
-                else if(v.length>2) v=v.replace(/^(\d{2})(\d+)$/,'$1.$2');
+                var v=this.value.replace(/\D/g,'').substring(0,14);
+                if(v.length>12)v=v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,'$1.$2.$3/$4-$5');
+                else if(v.length>8)v=v.replace(/^(\d{2})(\d{3})(\d{3})(\d+)$/,'$1.$2.$3/$4');
+                else if(v.length>5)v=v.replace(/^(\d{2})(\d{3})(\d+)$/,'$1.$2.$3');
+                else if(v.length>2)v=v.replace(/^(\d{2})(\d+)$/,'$1.$2');
                 this.value=v;
               ">
           </div>
@@ -163,8 +104,8 @@
             <label>CEP <span class="obrigatorio">*</span></label>
             <input type="text" id="cep" required placeholder="00000-000" maxlength="9"
               oninput="
-                var v = this.value.replace(/\D/g,'').substring(0,8);
-                if(v.length>5) v=v.replace(/^(\d{5})(\d+)$/,'$1-$2');
+                var v=this.value.replace(/\D/g,'').substring(0,8);
+                if(v.length>5)v=v.replace(/^(\d{5})(\d+)$/,'$1-$2');
                 this.value=v;
                 if(v.replace(/\D/g,'').length===8){
                   fetch('https://viacep.com.br/ws/'+v.replace(/\D/g,'')+'/json/')
@@ -233,11 +174,11 @@
             <label>WhatsApp <span class="obrigatorio">*</span></label>
             <input type="text" id="whatsappResponsavel" required placeholder="(00) 00000-0000" maxlength="15"
               oninput="
-                var v = this.value.replace(/\D/g,'').substring(0,11);
+                var v=this.value.replace(/\D/g,'').substring(0,11);
                 if(v.length===0){this.value='';return;}
-                if(v.length<=2) v='('+v;
-                else if(v.length<=6) v='('+v.substring(0,2)+') '+v.substring(2);
-                else if(v.length<=10) v='('+v.substring(0,2)+') '+v.substring(2,6)+'-'+v.substring(6);
+                if(v.length<=2)v='('+v;
+                else if(v.length<=6)v='('+v.substring(0,2)+') '+v.substring(2);
+                else if(v.length<=10)v='('+v.substring(0,2)+') '+v.substring(2,6)+'-'+v.substring(6);
                 else v='('+v.substring(0,2)+') '+v.substring(2,7)+'-'+v.substring(7);
                 this.value=v;
               ">
@@ -254,8 +195,8 @@
         <div class="form-group">
           <label>O contato operacional é o mesmo responsável?</label>
           <select id="contatoOpMesmo" onchange="
-            document.getElementById('camposContatoOp').style.display =
-              this.value === 'Não' ? 'block' : 'none';
+            document.getElementById('camposContatoOp').style.display=
+              this.value==='Não'?'block':'none';
           ">
             <option value="">Selecione...</option>
             <option value="Sim">Sim</option>
@@ -278,11 +219,11 @@
               <label>WhatsApp</label>
               <input type="text" id="whatsappContatoOp" placeholder="(00) 00000-0000" maxlength="15"
                 oninput="
-                  var v = this.value.replace(/\D/g,'').substring(0,11);
+                  var v=this.value.replace(/\D/g,'').substring(0,11);
                   if(v.length===0){this.value='';return;}
-                  if(v.length<=2) v='('+v;
-                  else if(v.length<=6) v='('+v.substring(0,2)+') '+v.substring(2);
-                  else if(v.length<=10) v='('+v.substring(0,2)+') '+v.substring(2,6)+'-'+v.substring(6);
+                  if(v.length<=2)v='('+v;
+                  else if(v.length<=6)v='('+v.substring(0,2)+') '+v.substring(2);
+                  else if(v.length<=10)v='('+v.substring(0,2)+') '+v.substring(2,6)+'-'+v.substring(6);
                   else v='('+v.substring(0,2)+') '+v.substring(2,7)+'-'+v.substring(7);
                   this.value=v;
                 ">
@@ -451,7 +392,7 @@
     </form>
   </div>
 
-  <!-- Aba Consulta -->
+  <!-- ═══ ABA CONSULTA ═══ -->
   <div id="tab-consulta" class="tab-conteudo">
     <div class="card">
       <h2>📚 Estabelecimentos Cadastrados</h2>
@@ -465,25 +406,24 @@
           <input type="text" id="filtroCidade" placeholder="Digite parte da cidade">
         </div>
       </div>
-      <div id="listaContainer">
-        <table class="listagem" id="tabelaEstabelecimentos">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nome Fantasia</th>
-              <th>Cidade/UF</th>
-              <th>Segmento</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td colspan="5">Carregando...</td></tr>
-          </tbody>
-        </table>
-        <div class="hint">Clique em uma linha para carregar o cadastro na aba "Novo Cadastro" e editar.</div>
-      </div>
+      <table class="listagem" id="tabelaEstabelecimentos">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome Fantasia</th>
+            <th>Cidade / UF</th>
+            <th>Segmento</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="5">Carregando...</td></tr>
+        </tbody>
+      </table>
+      <div class="hint" style="margin-top:8px;">Clique em uma linha para editar o cadastro.</div>
     </div>
   </div>
+
 </div>
 
 <script>
@@ -491,86 +431,100 @@
 
   var linhaEmEdicao = null;
   var idEmEdicao    = null;
+  var listaGlobal   = [];
 
   document.getElementById('dataPrimeiroContato').value =
     new Date().toISOString().split('T')[0];
 
+  // ─── Abas ───────────────────────────────────────────────────
+  document.querySelectorAll('.tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      trocarTab(this.dataset.tab);
+    });
+  });
+
+  function trocarTab(idTab) {
+    document.querySelectorAll('.tab-btn').forEach(function(b) {
+      b.classList.toggle('ativo', b.dataset.tab === idTab);
+    });
+    document.querySelectorAll('.tab-conteudo').forEach(function(div) {
+      div.classList.toggle('ativo', div.id === idTab);
+    });
+    if (idTab === 'tab-consulta') carregarLista();
+  }
+
+  // ─── Helpers ────────────────────────────────────────────────
   function getCheckboxValues(name) {
     return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
       .map(function(cb) { return cb.value; }).join(', ');
   }
 
   function setCheckboxValues(name, csv) {
-    var valores = (csv || '').split(',').map(function(v){return v.trim();}).filter(Boolean);
-    document.querySelectorAll('input[name="' + name + '"]').forEach(function(cb){
+    var valores = (csv || '').split(',').map(function(v) { return v.trim(); });
+    document.querySelectorAll('input[name="' + name + '"]').forEach(function(cb) {
       cb.checked = valores.indexOf(cb.value) !== -1;
     });
   }
 
-  function trocarTab(idTab) {
-    document.querySelectorAll('.tab-btn').forEach(function(b){
-      b.classList.toggle('ativo', b.dataset.tab === idTab);
-    });
-    document.querySelectorAll('.tab-conteudo').forEach(function(div){
-      div.classList.toggle('ativo', div.id === idTab);
-    });
+  function setSelect(id, valor) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    for (var i = 0; i < el.options.length; i++) {
+      if (el.options[i].value === valor || el.options[i].text === valor) {
+        el.selectedIndex = i;
+        return;
+      }
+    }
+    el.value = '';
   }
 
-  document.querySelectorAll('.tab-btn').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      trocarTab(this.dataset.tab);
-    });
-  });
-
+  // ─── Cancelar edição ────────────────────────────────────────
   function cancelarEdicao() {
     linhaEmEdicao = null;
     idEmEdicao    = null;
-    document.getElementById('infoEdicao').style.display = 'none';
+    document.getElementById('infoEdicao').style.display   = 'none';
     document.getElementById('formCadastro').reset();
     document.getElementById('camposContatoOp').style.display = 'none';
     document.getElementById('dataPrimeiroContato').value =
       new Date().toISOString().split('T')[0];
-    document.getElementById('btnSubmit').textContent = '💾 Salvar Estabelecimento';
+    document.getElementById('btnSubmit').innerHTML = '💾 Salvar Estabelecimento';
   }
 
-  function carregarListaEstabelecimentos() {
+  // ─── Carregar lista ─────────────────────────────────────────
+  function carregarLista() {
     var tbody = document.querySelector('#tabelaEstabelecimentos tbody');
     tbody.innerHTML = '<tr><td colspan="5">Carregando...</td></tr>';
-
     fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: 'listarEstabelecimentos' }) })
-      .then(function(r){ return r.json(); })
-      .then(function(resp){
+      .then(function(r) { return r.json(); })
+      .then(function(resp) {
         if (!resp.sucesso) {
-          tbody.innerHTML = '<tr><td colspan="5">Erro ao carregar: ' + resp.mensagem + '</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5">Erro: ' + resp.mensagem + '</td></tr>';
           return;
         }
-        var lista = resp.estabelecimentos || [];
-        if (lista.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5">Nenhum estabelecimento cadastrado.</td></tr>';
-          return;
-        }
-        renderTabela(lista);
+        listaGlobal = resp.estabelecimentos || [];
+        renderTabela(listaGlobal);
       })
-      .catch(function(err){
-        tbody.innerHTML = '<tr><td colspan="5">Erro: ' + err.message + '</td></tr>';
+      .catch(function(err) {
+        tbody.innerHTML = '<tr><td colspan="5">Erro de conexão: ' + err.message + '</td></tr>';
       });
   }
 
-  var listaGlobalEst = [];
-
   function renderTabela(lista) {
-    listaGlobalEst = lista;
     var tbody = document.querySelector('#tabelaEstabelecimentos tbody');
     tbody.innerHTML = '';
-    lista.forEach(function(est){
+    if (lista.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5">Nenhum registro encontrado.</td></tr>';
+      return;
+    }
+    lista.forEach(function(est) {
       var tr = document.createElement('tr');
       tr.innerHTML =
         '<td>' + est.id + '</td>' +
         '<td>' + est.nome + '</td>' +
-        '<td><span class="badge badge-cidade">' + (est.cidade || '-') + ' / ' + (est.estado || '-') + '</span></td>' +
-        '<td>' + (est.segmento || '-') + '</td>' +
-        '<td><span class="badge badge-status">' + (est.status || '-') + '</span></td>';
-      tr.addEventListener('click', function(){
+        '<td><span class="badge badge-cidade">' + (est.cidade||'-') + ' / ' + (est.estado||'-') + '</span></td>' +
+        '<td>' + (est.segmento||'-') + '</td>' +
+        '<td><span class="badge badge-status">' + (est.status||'-') + '</span></td>';
+      tr.addEventListener('click', function() {
         editarEstabelecimento(est.linha, est.id, est.nome);
       });
       tbody.appendChild(tr);
@@ -583,80 +537,87 @@
   function aplicarFiltros() {
     var nome   = document.getElementById('filtroNome').value.toLowerCase();
     var cidade = document.getElementById('filtroCidade').value.toLowerCase();
-    var filtrada = listaGlobalEst.filter(function(e){
-      var okNome   = !nome   || (e.nome   || '').toLowerCase().indexOf(nome)   !== -1;
-      var okCidade = !cidade || (e.cidade || '').toLowerCase().indexOf(cidade) !== -1;
+    var filtrada = listaGlobal.filter(function(e) {
+      var okNome   = !nome   || (e.nome  ||'').toLowerCase().indexOf(nome)   !== -1;
+      var okCidade = !cidade || (e.cidade||'').toLowerCase().indexOf(cidade) !== -1;
       return okNome && okCidade;
     });
     renderTabela(filtrada);
   }
 
+  // ─── Editar ─────────────────────────────────────────────────
   function editarEstabelecimento(linha, id, nome) {
     fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: 'buscarEstabelecimento', linha: linha }) })
-      .then(function(r){ return r.json(); })
-      .then(function(d){
-        if (!d.sucesso) {
-          alert('Erro ao carregar estabelecimento: ' + d.mensagem);
-          return;
-        }
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (!d.sucesso) { alert('Erro: ' + d.mensagem); return; }
+
         linhaEmEdicao = linha;
         idEmEdicao    = id;
 
         document.getElementById('infoEdicao').style.display = 'block';
         document.getElementById('infoEdicaoNome').textContent = nome;
         document.getElementById('infoEdicaoId').textContent   = id;
-        document.getElementById('btnSubmit').textContent = '💾 Salvar Alterações';
+        document.getElementById('btnSubmit').innerHTML = '💾 Salvar Alterações';
 
-        document.getElementById('nomeFantasia').value      = d['Nome Fantasia'] || '';
-        document.getElementById('razaoSocial').value       = d['Razão Social'] || '';
-        document.getElementById('cnpj').value              = d['CNPJ'] || '';
-        document.getElementById('segmento').value          = d['Segmento'] || '';
-        document.getElementById('cep').value               = d['CEP'] || '';
-        document.getElementById('logradouro').value        = d['Logradouro'] || '';
-        document.getElementById('numero').value            = d['Número'] || '';
-        document.getElementById('complemento').value       = d['Complemento'] || '';
-        document.getElementById('bairro').value            = d['Bairro'] || '';
-        document.getElementById('cidade').value            = d['Cidade'] || '';
-        document.getElementById('estado').value            = d['Estado'] || '';
-        document.getElementById('pontoReferencia').value   = d['Ponto Referência'] || '';
-        document.getElementById('nomeResponsavel').value   = d['Nome Responsável'] || '';
-        document.getElementById('cargoResponsavel').value  = d['Cargo Responsável'] || '';
-        document.getElementById('whatsappResponsavel').value = d['WhatsApp'] || '';
-        document.getElementById('emailResponsavel').value  = d['Email'] || '';
-        document.getElementById('contatoOpMesmo').value    = d['Contato Op Mesmo'] || '';
+        document.getElementById('nomeFantasia').value          = d['Nome Fantasia']            || '';
+        document.getElementById('razaoSocial').value           = d['Razão Social']             || '';
+        document.getElementById('cnpj').value                  = d['CNPJ']                     || '';
+        setSelect('segmento', d['Segmento']);
+        document.getElementById('cep').value                   = d['CEP']                      || '';
+        document.getElementById('logradouro').value            = d['Logradouro']               || '';
+        document.getElementById('numero').value                = d['Número']                   || '';
+        document.getElementById('complemento').value           = d['Complemento']              || '';
+        document.getElementById('bairro').value                = d['Bairro']                   || '';
+        document.getElementById('cidade').value                = d['Cidade']                   || '';
+        document.getElementById('estado').value                = d['Estado']                   || '';
+        document.getElementById('pontoReferencia').value       = d['Ponto Referência']         || '';
+        document.getElementById('nomeResponsavel').value       = d['Nome Responsável']         || '';
+        document.getElementById('cargoResponsavel').value      = d['Cargo Responsável']        || '';
+        document.getElementById('whatsappResponsavel').value   = d['WhatsApp']                 || '';
+        document.getElementById('emailResponsavel').value      = d['Email']                    || '';
 
+        var contatoOp = d['Contato Op Mesmo'] || '';
+        setSelect('contatoOpMesmo', contatoOp);
         document.getElementById('camposContatoOp').style.display =
-          (d['Contato Op Mesmo'] === 'Não') ? 'block' : 'none';
+          contatoOp === 'Não' ? 'block' : 'none';
 
-        document.getElementById('nomeContatoOp').value     = d['Nome Contato Op'] || '';
-        document.getElementById('cargoContatoOp').value    = d['Cargo Contato Op'] || '';
-        document.getElementById('whatsappContatoOp').value = d['WhatsApp Op'] || '';
-        document.getElementById('emailContatoOp').value    = d['Email Op'] || '';
+        document.getElementById('nomeContatoOp').value         = d['Nome Contato Op']          || '';
+        document.getElementById('cargoContatoOp').value        = d['Cargo Contato Op']         || '';
+        document.getElementById('whatsappContatoOp').value     = d['WhatsApp Op']              || '';
+        document.getElementById('emailContatoOp').value        = d['Email Op']                 || '';
+
         setCheckboxValues('dias', d['Dias Funcionamento'] || '');
-        document.getElementById('horarioAbertura').value   = d['Abertura'] || '';
-        document.getElementById('horarioFechamento').value = d['Fechamento'] || '';
-        document.getElementById('feriados').value          = d['Feriados'] || '';
-        document.getElementById('perfilPublico').value     = d['Perfil Público'] || '';
-        document.getElementById('fluxoDiario').value       = d['Fluxo Diário'] || '';
-        document.getElementById('tempoPermanencia').value  = d['Tempo Permanência'] || '';
-        document.getElementById('internet').value          = d['Internet'] || '';
-        document.getElementById('tipoConexao').value       = d['Tipo Conexão'] || '';
-        document.getElementById('energiaProxima').value    = d['Energia Próxima'] || '';
-        document.getElementById('obsInfraestrutura').value = d['Obs Infraestrutura'] || '';
-        document.getElementById('comoChegou').value        = d['Como Chegou'] || '';
-        document.getElementById('responsavelProspeccao').value = d['Responsável Prospecção'] || '';
-        document.getElementById('dataPrimeiroContato').value   = d['Data Primeiro Contato'] || '';
-        document.getElementById('status').value            = d['Status'] || '';
-        document.getElementById('observacoesGerais').value = d['Observações'] || '';
+
+        document.getElementById('horarioAbertura').value       = d['Abertura']                 || '';
+        document.getElementById('horarioFechamento').value     = d['Fechamento']               || '';
+
+        setSelect('feriados',        d['Feriados']);
+        setSelect('perfilPublico',   d['Perfil Público']);
+        setSelect('fluxoDiario',     d['Fluxo Diário']);
+        setSelect('tempoPermanencia',d['Tempo Permanência']);
+        setSelect('internet',        d['Internet']);
+        setSelect('tipoConexao',     d['Tipo Conexão']);
+        setSelect('energiaProxima',  d['Energia Próxima']);
+
+        document.getElementById('obsInfraestrutura').value     = d['Obs Infraestrutura']       || '';
+
+        setSelect('comoChegou', d['Como Chegou']);
+
+        document.getElementById('responsavelProspeccao').value = d['Responsável Prospecção']   || '';
+        document.getElementById('dataPrimeiroContato').value   = d['Data Primeiro Contato']    || '';
+
+        setSelect('status', d['Status']);
+
+        document.getElementById('observacoesGerais').value     = d['Observações']              || '';
 
         trocarTab('tab-novo');
         window.scrollTo(0, 0);
       })
-      .catch(function(err){
-        alert('Erro ao buscar dados: ' + err.message);
-      });
+      .catch(function(err) { alert('Erro: ' + err.message); });
   }
 
+  // ─── Submit ─────────────────────────────────────────────────
   document.getElementById('formCadastro').addEventListener('submit', function(e) {
     e.preventDefault();
     var btn    = document.getElementById('btnSubmit');
@@ -713,16 +674,8 @@
         if (resultado.sucesso) {
           alerta.className = 'alerta sucesso';
           alerta.innerHTML = '✅ ' + resultado.mensagem + (resultado.id ? ' | ID: ' + resultado.id : '');
-          if (linhaEmEdicao) {
-            carregarListaEstabelecimentos();
-          } else {
-            document.getElementById('formCadastro').reset();
-            document.getElementById('camposContatoOp').style.display = 'none';
-            document.getElementById('dataPrimeiroContato').value =
-              new Date().toISOString().split('T')[0];
-            carregarListaEstabelecimentos();
-          }
           cancelarEdicao();
+          carregarLista();
         } else {
           alerta.className = 'alerta erro';
           alerta.innerHTML = '❌ ' + resultado.mensagem;
@@ -730,7 +683,7 @@
         alerta.style.display = 'block';
         window.scrollTo(0, 0);
         btn.disabled = false;
-        btn.innerHTML = '💾 Salvar Estabelecimento';
+        btn.innerHTML = linhaEmEdicao ? '💾 Salvar Alterações' : '💾 Salvar Estabelecimento';
       })
       .catch(function(err) {
         alerta.className = 'alerta erro';
@@ -741,7 +694,7 @@
       });
   });
 
-  carregarListaEstabelecimentos();
+  carregarLista();
 </script>
 </body>
 </html>
