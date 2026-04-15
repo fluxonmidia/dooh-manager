@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chamado Técnico</title>
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<div class="header">
+  <button class="back-btn" onclick="location.href='index.html'">← Voltar</button>
+  <div>
+    <h1>🔧 Chamado Técnico</h1>
+    <div class="subtitle">Registro de problemas nas telas/players</div>
+  </div>
+</div>
+
+<div class="container">
+  <div id="alerta" class="alerta"></div>
+
+  <form id="formChamado">
+
+    <div class="card">
+      <h2>📋 Identificação</h2>
+
+      <div class="form-group">
+        <label>Estabelecimento <span class="obrigatorio">*</span></label>
+        <select id="estabelecimento" required>
+          <option value="">Carregando lista...</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nome de quem abre o chamado <span class="obrigatorio">*</span></label>
+          <input type="text" id="nomeSolicitante" required>
+        </div>
+        <div class="form-group">
+          <label>Cargo / Função <span class="obrigatorio">*</span></label>
+          <input type="text" id="cargo" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>WhatsApp para contato <span class="obrigatorio">*</span></label>
+        <input type="text" id="whatsappContato" required placeholder="(00) 00000-0000">
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🚨 Problema Reportado</h2>
+
+      <div class="form-group">
+        <label>Qual tela/ponto está com problema? <span class="obrigatorio">*</span></label>
+        <select id="telaProblema" required>
+          <option value="">Selecione...</option>
+          <option>Entrada</option>
+          <option>Caixa / Checkout</option>
+          <option>Balcão</option>
+          <option>Salão / Área principal</option>
+          <option>Totem</option>
+          <option>Todas as telas</option>
+          <option>Não sei informar</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Quando o problema começou? <span class="obrigatorio">*</span></label>
+        <select id="quandoComecou" required>
+          <option value="">Selecione...</option>
+          <option>Agora</option>
+          <option>Hoje, mais cedo</option>
+          <option>Ontem</option>
+          <option>Há alguns dias</option>
+          <option>Não sei dizer</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Tipo de problema <span class="obrigatorio">*</span></label>
+        <select id="tipoProblema" required>
+          <option value="">Selecione...</option>
+          <option>Tela apagada (sem imagem, TV desligada)</option>
+          <option>Tela ligada, mas sem conteúdo</option>
+          <option>Conteúdo travado / imagem congelada</option>
+          <option>Conteúdo incorreto aparecendo</option>
+          <option>Sem som</option>
+          <option>Som muito alto</option>
+          <option>Som muito baixo</option>
+          <option>Tela danificada fisicamente</option>
+          <option>Player não liga / sem luz</option>
+          <option>Outro</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Descreva o problema com suas palavras <span class="obrigatorio">*</span></label>
+        <textarea id="descricaoProblema" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>O problema é constante ou vai e volta? <span class="obrigatorio">*</span></label>
+        <select id="constanteIntermitente" required>
+          <option value="">Selecione...</option>
+          <option>Constante (sempre acontece)</option>
+          <option>Intermitente (às vezes funciona, às vezes não)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🔌 Checklist Básico</h2>
+
+      <div class="form-group">
+        <label>A TV está conectada na tomada? <span class="obrigatorio">*</span></label>
+        <select id="tvTomada" required>
+          <option value="">Selecione...</option>
+          <option>Sim</option>
+          <option>Não</option>
+          <option>Não sei</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>A TV está ligada no controle/botão? <span class="obrigatorio">*</span></label>
+        <select id="tvLigada" required>
+          <option value="">Selecione...</option>
+          <option>Sim</option>
+          <option>Não</option>
+          <option>Não sei</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>O cabo do player está conectado na TV? <span class="obrigatorio">*</span></label>
+        <select id="caboConectado" required>
+          <option value="">Selecione...</option>
+          <option>Sim</option>
+          <option>Não</option>
+          <option>Não sei</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>A internet do local está funcionando normalmente? <span class="obrigatorio">*</span></label>
+        <select id="internetOk" required>
+          <option value="">Selecione...</option>
+          <option>Sim</option>
+          <option>Não</option>
+          <option>Não sei</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Já tentou desligar e ligar novamente o equipamento? <span class="obrigatorio">*</span></label>
+        <select id="tentouReligar" required>
+          <option value="">Selecione...</option>
+          <option>Sim, já tentei</option>
+          <option>Não tentei</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📅 Atendimento</h2>
+
+      <div class="form-group">
+        <label>Melhor horário para contato / atendimento remoto <span class="obrigatorio">*</span></label>
+        <input type="text" id="melhorHorario" required placeholder="Ex.: manhã, das 9h às 11h">
+      </div>
+
+      <div class="form-group">
+        <label>Autoriza acesso remoto ao equipamento, se necessário? <span class="obrigatorio">*</span></label>
+        <select id="autorizaAcesso" required>
+          <option value="">Selecione...</option>
+          <option>Sim, autorizo</option>
+          <option>Não autorizo</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Observações adicionais <span class="opcional">(opcional)</span></label>
+        <textarea id="observacoesAdicionais"></textarea>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-submit" id="btnSubmit">💾 Abrir Chamado</button>
+  </form>
+</div>
+
+<script>
+  var API_URL = 'https://script.google.com/macros/s/AKfycbwtA46Q55_pTTPzTh9aXjQh2syF27IYWk0ZRO50KNhCmEdfOQtKqZ8pKazn7l9mvFuAeg/exec';
+
+  document.addEventListener('DOMContentLoaded', function() {
+    fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: 'getEstabelecimentos' }) })
+      .then(function(r) { return r.json(); })
+      .then(function(lista) {
+        var select = document.getElementById('estabelecimento');
+        select.innerHTML = '<option value="">Selecione...</option>';
+        if (!lista || lista.length === 0) {
+          select.innerHTML = '<option value="">Nenhum estabelecimento cadastrado</option>';
+          return;
+        }
+        lista.forEach(function(est) {
+          var opt = document.createElement('option');
+          opt.value = est.nome;
+          opt.textContent = est.nome;
+          select.appendChild(opt);
+        });
+      })
+      .catch(function() {
+        document.getElementById('estabelecimento').innerHTML = '<option value="">Erro ao carregar</option>';
+      });
+  });
+
+  document.getElementById('formChamado').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var btn = document.getElementById('btnSubmit');
+    var alerta = document.getElementById('alerta');
+    alerta.style.display = 'none';
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading"></span> Enviando...';
+
+    var dados = {
+      acao: 'salvarChamado',
+      estabelecimento: document.getElementById('estabelecimento').value,
+      nomeSolicitante: document.getElementById('nomeSolicitante').value,
+      cargo: document.getElementById('cargo').value,
+      whatsappContato: document.getElementById('whatsappContato').value,
+      telaProblema: document.getElementById('telaProblema').value,
+      quandoComecou: document.getElementById('quandoComecou').value,
+      tipoProblema: document.getElementById('tipoProblema').value,
+      descricaoProblema: document.getElementById('descricaoProblema').value,
+      constanteIntermitente: document.getElementById('constanteIntermitente').value,
+      tvTomada: document.getElementById('tvTomada').value,
+      tvLigada: document.getElementById('tvLigada').value,
+      caboConectado: document.getElementById('caboConectado').value,
+      internetOk: document.getElementById('internetOk').value,
+      tentouReligar: document.getElementById('tentouReligar').value,
+      melhorHorario: document.getElementById('melhorHorario').value,
+      autorizaAcesso: document.getElementById('autorizaAcesso').value,
+      observacoesAdicionais: document.getElementById('observacoesAdicionais').value
+    };
+
+    fetch(API_URL, { method: 'POST', body: JSON.stringify(dados) })
+      .then(function(r) { return r.json(); })
+      .then(function(resultado) {
+        if (resultado.sucesso) {
+          alerta.className = 'alerta sucesso';
+          alerta.innerHTML = '✅ ' + resultado.mensagem + ' | ID: ' + resultado.id;
+          document.getElementById('formChamado').reset();
+        } else {
+          alerta.className = 'alerta erro';
+          alerta.innerHTML = '❌ ' + resultado.mensagem;
+        }
+        alerta.style.display = 'block';
+        window.scrollTo(0, 0);
+        btn.disabled = false;
+        btn.innerHTML = '💾 Abrir Chamado';
+      })
+      .catch(function(err) {
+        alerta.className = 'alerta erro';
+        alerta.innerHTML = '❌ Erro de conexão: ' + err.message;
+        alerta.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = '💾 Abrir Chamado';
+      });
+  });
+</script>
+
+</body>
+</html>

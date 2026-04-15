@@ -1,0 +1,42 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #333; }
+.header { background: #1a73e8; color: white; padding: 16px 24px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.header h1 { font-size: 18px; font-weight: 600; }
+.header .subtitle { font-size: 12px; opacity: 0.85; }
+.back-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+.container { max-width: 800px; margin: 24px auto; padding: 0 16px 80px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
+.card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.card h2 { font-size: 15px; color: #1a73e8; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e8f0fe; }
+.card-menu { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; text-align: center; transition: transform 0.2s; }
+.card-menu:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+.card-menu .icone { font-size: 48px; margin-bottom: 12px; }
+.card-menu h2 { font-size: 16px; color: #1a73e8; margin-bottom: 8px; border: none; padding: 0; }
+.card-menu p { color: #888; font-size: 13px; }
+.form-group { margin-bottom: 16px; }
+label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
+.obrigatorio { color: #e53935; }
+.opcional { font-size: 11px; color: #999; font-weight: normal; margin-left: 4px; }
+.hint { font-size: 12px; color: #999; margin-top: 4px; }
+input[type="text"], input[type="email"], input[type="date"], input[type="time"], input[type="number"], select, textarea { width: 100%; padding: 12px 14px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 15px; color: #333; background: #fafafa; -webkit-appearance: none; appearance: none; font-family: inherit; }
+input:focus, select:focus, textarea:focus { border-color: #1a73e8; outline: none; background: white; box-shadow: 0 0 0 3px rgba(26,115,232,0.12); }
+textarea { resize: vertical; min-height: 90px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } .grid { grid-template-columns: 1fr; } }
+.checkbox-group, .radio-group { display: flex; flex-direction: column; gap: 8px; }
+.checkbox-item, .radio-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1.5px solid #ddd; border-radius: 8px; background: #fafafa; cursor: pointer; font-size: 14px; }
+.checkbox-item:hover, .radio-item:hover { border-color: #1a73e8; background: #e8f0fe; }
+.checkbox-item input, .radio-item input { width: 18px; height: 18px; cursor: pointer; }
+.secao-ponto { border: 2px dashed #1a73e8; border-radius: 12px; padding: 20px; margin-bottom: 16px; background: #f8faff; }
+.secao-ponto h3 { color: #1a73e8; margin-bottom: 16px; font-size: 15px; }
+.btn-add-ponto { width: 100%; padding: 14px; border: 2px dashed #1a73e8; border-radius: 8px; background: white; color: #1a73e8; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 20px; }
+.btn-add-ponto:hover { background: #e8f0fe; }
+.btn-remove { background: #fce8e6; color: #c62828; border: none; padding: 8px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; margin-bottom: 12px; font-weight: 600; }
+.btn-submit { width: 100%; padding: 16px; background: #1a73e8; color: white; border: none; border-radius: 10px; font-size: 17px; font-weight: 700; cursor: pointer; margin-top: 8px; font-family: inherit; }
+.btn-submit:hover { background: #1557b0; }
+.btn-submit:disabled { background: #aaa; cursor: not-allowed; }
+.alerta { padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; font-size: 15px; font-weight: 500; display: none; }
+.alerta.sucesso { background: #e6f4ea; color: #1e7e34; border: 1px solid #a8d5b5; }
+.alerta.erro { background: #fce8e6; color: #c62828; border: 1px solid #f5c6c6; }
+.loading { display: inline-block; width: 16px; height: 16px; border: 3px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 8px; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
