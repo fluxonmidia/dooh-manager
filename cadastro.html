@@ -33,7 +33,7 @@
         </div>
         <div class="form-group">
           <label>CNPJ <span class="opcional">(opcional)</span></label>
-          <input type="text" id="cnpj" placeholder="00.000.000/0000-00">
+          <input type="text" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18">
         </div>
       </div>
       <div class="form-group">
@@ -63,7 +63,7 @@
       <div class="form-row">
         <div class="form-group">
           <label>CEP <span class="obrigatorio">*</span></label>
-          <input type="text" id="cep" required placeholder="00000-000" oninput="buscarCep(this.value)">
+          <input type="text" id="cep" required placeholder="00000-000" maxlength="9">
         </div>
         <div class="form-group">
           <label>Número <span class="obrigatorio">*</span></label>
@@ -115,11 +115,45 @@
       <div class="form-row">
         <div class="form-group">
           <label>WhatsApp <span class="obrigatorio">*</span></label>
-          <input type="text" id="whatsappResponsavel" required placeholder="(00) 00000-0000">
+          <input type="text" id="whatsappResponsavel" required placeholder="(00) 00000-0000" maxlength="15">
         </div>
         <div class="form-group">
           <label>E-mail <span class="opcional">(opcional)</span></label>
           <input type="email" id="emailResponsavel">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>👤 Contato Operacional</h2>
+      <div class="form-group">
+        <label>O contato operacional é o mesmo responsável?</label>
+        <select id="contatoOpMesmo" onchange="toggleContatoOp(this.value)">
+          <option value="">Selecione...</option>
+          <option value="Sim">Sim</option>
+          <option value="Não">Não, informar outro contato</option>
+        </select>
+      </div>
+      <div id="camposContatoOp" style="display:none;">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nome do Contato Operacional</label>
+            <input type="text" id="nomeContatoOp">
+          </div>
+          <div class="form-group">
+            <label>Cargo</label>
+            <input type="text" id="cargoContatoOp">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>WhatsApp</label>
+            <input type="text" id="whatsappContatoOp" placeholder="(00) 00000-0000" maxlength="15">
+          </div>
+          <div class="form-group">
+            <label>E-mail <span class="opcional">(opcional)</span></label>
+            <input type="email" id="emailContatoOp">
+          </div>
         </div>
       </div>
     </div>
@@ -283,32 +317,87 @@
 <script>
   var API_URL = 'https://script.google.com/macros/s/AKfycbwtA46Q55_pTTPzTh9aXjQh2syF27IYWk0ZRO50KNhCmEdfOQtKqZ8pKazn7l9mvFuAeg/exec';
 
-  function buscarCep(cep) {
-    cep = cep.replace(/\D/g, '');
-    if (cep.length === 8) {
-      fetch('https://viacep.com.br/ws/' + cep + '/json/')
-        .then(function(r) { return r.json(); })
-        .then(function(d) {
-          if (!d.erro) {
-            document.getElementById('logradouro').value = d.logradouro || '';
-            document.getElementById('bairro').value = d.bairro || '';
-            document.getElementById('cidade').value = d.localidade || '';
-            document.getElementById('estado').value = d.uf || '';
-          }
-        });
-    }
+  // ─── Máscaras ───────────────────────────────────────────────
+  function mascaraCNPJ(campo) {
+    campo.addEventListener('input', function() {
+      var v = this.value.replace(/\D/g, '').substring(0, 14);
+      v = v.replace(/
+^
+(\d{2})(\d)/, '$1.$2');
+      v = v.replace(/
+^
+(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+      v = v.replace(/\.(\d{3})(\d)/, '.$1/$2');
+      v = v.replace(/(\d{4})(\d)/, '$1-$2');
+      this.value = v;
+    });
   }
 
+  function mascaraCEP(campo, callbackBusca) {
+    campo.addEventListener('input', function() {
+      var v = this.value.replace(/\D/g, '').substring(0, 8);
+      if (v.length > 5) v = v.replace(/(\d{5})(\d)/, '$1-$2');
+      this.value = v;
+      if (v.replace(/\D/g, '').length === 8) callbackBusca(v);
+    });
+  }
+
+  function mascaraTelefone(campo) {
+    campo.addEventListener('input', function() {
+      var v = this.value.replace(/\D/g, '').substring(0, 11);
+      if (v.length === 0) { this.value = ''; return; }
+      if (v.length <= 2) {
+        this.value = '(' + v;
+      } else if (v.length <= 6) {
+        this.value = '(' + v.substring(0,2) + ') ' + v.substring(2);
+      } else if (v.length <= 10) {
+        this.value = '(' + v.substring(0,2) + ') ' + v.substring(2,6) + '-' + v.substring(6);
+      } else {
+        this.value = '(' + v.substring(0,2) + ') ' + v.substring(2,7) + '-' + v.substring(7);
+      }
+    });
+  }
+
+  // ─── Consulta CEP ───────────────────────────────────────────
+  function buscarCep(cep) {
+    var digits = cep.replace(/\D/g, '');
+    if (digits.length !== 8) return;
+    fetch('https://viacep.com.br/ws/' + digits + '/json/')
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (!d.erro) {
+          document.getElementById('logradouro').value = d.logradouro || '';
+          document.getElementById('bairro').value = d.bairro || '';
+          document.getElementById('cidade').value = d.localidade || '';
+          document.getElementById('estado').value = d.uf || '';
+        }
+      });
+  }
+
+  // ─── Toggle contato operacional ─────────────────────────────
+  function toggleContatoOp(valor) {
+    document.getElementById('camposContatoOp').style.display =
+      valor === 'Não' ? 'block' : 'none';
+  }
+
+  // ─── Helpers ────────────────────────────────────────────────
   function getCheckboxValues(name) {
     return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
       .map(function(cb) { return cb.value; }).join(', ');
   }
 
+  // ─── Init ───────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', function() {
-    var hoje = new Date().toISOString().split('T')[0];
-    document.getElementById('dataPrimeiroContato').value = hoje;
+    document.getElementById('dataPrimeiroContato').value =
+      new Date().toISOString().split('T')[0];
+
+    mascaraCNPJ(document.getElementById('cnpj'));
+    mascaraCEP(document.getElementById('cep'), buscarCep);
+    mascaraTelefone(document.getElementById('whatsappResponsavel'));
+    mascaraTelefone(document.getElementById('whatsappContatoOp'));
   });
 
+  // ─── Submit ─────────────────────────────────────────────────
   document.getElementById('formCadastro').addEventListener('submit', function(e) {
     e.preventDefault();
     var btn = document.getElementById('btnSubmit');
@@ -335,7 +424,11 @@
       cargoResponsavel: document.getElementById('cargoResponsavel').value,
       whatsappResponsavel: document.getElementById('whatsappResponsavel').value,
       emailResponsavel: document.getElementById('emailResponsavel').value,
-      contatoOpMesmo: '', nomeContatoOp: '', cargoContatoOp: '', whatsappContatoOp: '', emailContatoOp: '',
+      contatoOpMesmo: document.getElementById('contatoOpMesmo').value,
+      nomeContatoOp: document.getElementById('nomeContatoOp').value,
+      cargoContatoOp: document.getElementById('cargoContatoOp').value,
+      whatsappContatoOp: document.getElementById('whatsappContatoOp').value,
+      emailContatoOp: document.getElementById('emailContatoOp').value,
       diasFuncionamento: getCheckboxValues('dias'),
       horarioAbertura: document.getElementById('horarioAbertura').value,
       horarioFechamento: document.getElementById('horarioFechamento').value,
@@ -361,6 +454,7 @@
           alerta.className = 'alerta sucesso';
           alerta.innerHTML = '✅ ' + resultado.mensagem + ' | ID: ' + resultado.id;
           document.getElementById('formCadastro').reset();
+          document.getElementById('camposContatoOp').style.display = 'none';
         } else {
           alerta.className = 'alerta erro';
           alerta.innerHTML = '❌ ' + resultado.mensagem;
