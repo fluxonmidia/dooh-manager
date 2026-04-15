@@ -40,7 +40,16 @@
       </div>
       <div class="form-group">
         <label>Contato no Local <span class="opcional">(opcional)</span></label>
-        <input type="text" id="contatoLocal">
+        <input type="text" id="contatoLocal" placeholder="(00) 00000-0000" maxlength="15"
+          oninput="
+            var v = this.value.replace(/\D/g,'').substring(0,11);
+            if(v.length===0){this.value='';return;}
+            if(v.length<=2) v='('+v;
+            else if(v.length<=6) v='('+v.substring(0,2)+') '+v.substring(2);
+            else if(v.length<=10) v='('+v.substring(0,2)+') '+v.substring(2,6)+'-'+v.substring(6);
+            else v='('+v.substring(0,2)+') '+v.substring(2,7)+'-'+v.substring(7);
+            this.value=v;
+          ">
       </div>
     </div>
 
@@ -48,7 +57,10 @@
       <h2>⚡ Infraestrutura Geral</h2>
       <div class="form-group">
         <label>Internet disponível no local? <span class="obrigatorio">*</span></label>
-        <select id="internetLocal" required onchange="toggleWifi(this.value)">
+        <select id="internetLocal" required onchange="
+          document.getElementById('camposWifi').style.display =
+            this.value === 'Sim' ? 'block' : 'none';
+        ">
           <option value="">Selecione...</option>
           <option>Sim</option>
           <option>Não</option>
@@ -184,9 +196,27 @@
   var API_URL = 'https://script.google.com/macros/s/AKfycbwtA46Q55_pTTPzTh9aXjQh2syF27IYWk0ZRO50KNhCmEdfOQtKqZ8pKazn7l9mvFuAeg/exec';
   var contadorPontos = 0;
 
-  function toggleWifi(valor) {
-    document.getElementById('camposWifi').style.display = valor === 'Sim' ? 'block' : 'none';
-  }
+  document.getElementById('dataVisita').value = new Date().toISOString().split('T')[0];
+
+  fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: 'getEstabelecimentos' }) })
+    .then(function(r) { return r.json(); })
+    .then(function(lista) {
+      var select = document.getElementById('estabelecimento');
+      select.innerHTML = '<option value="">Selecione...</option>';
+      if (!lista || lista.length === 0) {
+        select.innerHTML = '<option value="">Nenhum estabelecimento cadastrado</option>';
+        return;
+      }
+      lista.forEach(function(est) {
+        var opt = document.createElement('option');
+        opt.value = est.nome;
+        opt.textContent = est.nome;
+        select.appendChild(opt);
+      });
+    })
+    .catch(function() {
+      document.getElementById('estabelecimento').innerHTML = '<option value="">Erro ao carregar</option>';
+    });
 
   function adicionarPonto() {
     contadorPontos++;
@@ -196,7 +226,7 @@
     div.id = 'ponto-' + id;
     div.innerHTML =
       '<h3>📍 Ponto ' + id + '</h3>' +
-      '<button type="button" class="btn-remove" onclick="removerPonto(' + id + ')">✕ Remover</button>' +
+      '<button type="button" class="btn-remove" onclick="document.getElementById(\'ponto-' + id + '\').remove()">✕ Remover</button>' +
       '<div class="form-group"><label>Identificação</label><input type="text" class="ponto-campo" data-campo="identificacao" placeholder="Ex.: Entrada principal"></div>' +
       '<div class="form-row">' +
         '<div class="form-group"><label>Local no Ambiente</label><select class="ponto-campo" data-campo="local"><option value="">Selecione...</option><option>Entrada</option><option>Recepção</option><option>Caixa / Checkout</option><option>Balcão</option><option>Salão / Área principal</option><option>Sala de espera</option><option>Corredor</option><option>Outro</option></select></div>' +
@@ -208,11 +238,6 @@
       '</div>' +
       '<div class="form-group"><label>Observações do Ponto</label><textarea class="ponto-campo" data-campo="observacoes"></textarea></div>';
     document.getElementById('listaPontos').appendChild(div);
-  }
-
-  function removerPonto(id) {
-    var el = document.getElementById('ponto-' + id);
-    if (el) el.remove();
   }
 
   function coletarPontos() {
@@ -227,61 +252,37 @@
     return pontos;
   }
 
-  document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('dataVisita').value = new Date().toISOString().split('T')[0];
-
-    fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: 'getEstabelecimentos' }) })
-      .then(function(r) { return r.json(); })
-      .then(function(lista) {
-        var select = document.getElementById('estabelecimento');
-        select.innerHTML = '<option value="">Selecione...</option>';
-        if (!lista || lista.length === 0) {
-          select.innerHTML = '<option value="">Nenhum estabelecimento cadastrado</option>';
-          return;
-        }
-        lista.forEach(function(est) {
-          var opt = document.createElement('option');
-          opt.value = est.nome;
-          opt.textContent = est.nome;
-          select.appendChild(opt);
-        });
-      })
-      .catch(function() {
-        document.getElementById('estabelecimento').innerHTML = '<option value="">Erro ao carregar</option>';
-      });
-  });
-
   document.getElementById('formVisita').addEventListener('submit', function(e) {
     e.preventDefault();
-    var btn = document.getElementById('btnSubmit');
+    var btn    = document.getElementById('btnSubmit');
     var alerta = document.getElementById('alerta');
     alerta.style.display = 'none';
     btn.disabled = true;
     btn.innerHTML = '<span class="loading"></span> Salvando...';
 
     var dados = {
-      acao: 'salvarVisita',
-      estabelecimento: document.getElementById('estabelecimento').value,
-      dataVisita: document.getElementById('dataVisita').value,
-      responsavelVisita: document.getElementById('responsavelVisita').value,
-      contatoLocal: document.getElementById('contatoLocal').value,
-      internetLocal: document.getElementById('internetLocal').value,
-      tipoConexao: document.getElementById('tipoConexao').value,
-      qualidadeWifi: document.getElementById('qualidadeWifi').value,
-      senhaWifi: document.getElementById('senhaWifi').value,
-      tensaoEletrica: document.getElementById('tensaoEletrica').value,
-      tomadasProximas: document.getElementById('tomadasProximas').value,
-      extensaoNecessaria: document.getElementById('extensaoNecessaria').value,
-      obsInfraestrutura: document.getElementById('obsInfraestrutura').value,
-      totalPontos: document.getElementById('totalPontos').value,
-      viabilidadeGeral: document.getElementById('viabilidadeGeral').value,
-      desafios: document.getElementById('desafios').value,
-      materiaisNecessarios: document.getElementById('materiaisNecessarios').value,
+      acao:                    'salvarVisita',
+      estabelecimento:         document.getElementById('estabelecimento').value,
+      dataVisita:              document.getElementById('dataVisita').value,
+      responsavelVisita:       document.getElementById('responsavelVisita').value,
+      contatoLocal:            document.getElementById('contatoLocal').value,
+      internetLocal:           document.getElementById('internetLocal').value,
+      tipoConexao:             document.getElementById('tipoConexao').value,
+      qualidadeWifi:           document.getElementById('qualidadeWifi').value,
+      senhaWifi:               document.getElementById('senhaWifi').value,
+      tensaoEletrica:          document.getElementById('tensaoEletrica').value,
+      tomadasProximas:         document.getElementById('tomadasProximas').value,
+      extensaoNecessaria:      document.getElementById('extensaoNecessaria').value,
+      obsInfraestrutura:       document.getElementById('obsInfraestrutura').value,
+      totalPontos:             document.getElementById('totalPontos').value,
+      viabilidadeGeral:        document.getElementById('viabilidadeGeral').value,
+      desafios:                document.getElementById('desafios').value,
+      materiaisNecessarios:    document.getElementById('materiaisNecessarios').value,
       equipamentosNecessarios: document.getElementById('equipamentosNecessarios').value,
-      dataInstalacao: document.getElementById('dataInstalacao').value,
-      apoioExterno: document.getElementById('apoioExterno').value,
-      observacoesFinais: document.getElementById('observacoesFinais').value,
-      pontos: coletarPontos()
+      dataInstalacao:          document.getElementById('dataInstalacao').value,
+      apoioExterno:            document.getElementById('apoioExterno').value,
+      observacoesFinais:       document.getElementById('observacoesFinais').value,
+      pontos:                  coletarPontos()
     };
 
     fetch(API_URL, { method: 'POST', body: JSON.stringify(dados) })
@@ -292,6 +293,7 @@
           alerta.innerHTML = '✅ ' + resultado.mensagem + ' | ID: ' + resultado.id;
           document.getElementById('formVisita').reset();
           document.getElementById('listaPontos').innerHTML = '';
+          document.getElementById('camposWifi').style.display = 'none';
           contadorPontos = 0;
         } else {
           alerta.className = 'alerta erro';
