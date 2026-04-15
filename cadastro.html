@@ -314,51 +314,60 @@
   </form>
 </div>
 
+<!-- O script vai no final do body, DEPOIS de todo o HTML -->
 <script>
   var API_URL = 'https://script.google.com/macros/s/AKfycbwtA46Q55_pTTPzTh9aXjQh2syF27IYWk0ZRO50KNhCmEdfOQtKqZ8pKazn7l9mvFuAeg/exec';
 
-  // ─── Máscaras ───────────────────────────────────────────────
-  function mascaraCNPJ(campo) {
-    campo.addEventListener('input', function() {
-      var v = this.value.replace(/\D/g, '').substring(0, 14);
-      v = v.replace(/
+  // ─── Máscaras ────────────────────────────────────────────────────────────────
+
+  function aplicarMascaraCNPJ(e) {
+    var v = e.target.value.replace(/\D/g, '').substring(0, 14);
+    if (v.length > 12) v = v.replace(/
 ^
-(\d{2})(\d)/, '$1.$2');
-      v = v.replace(/
+(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})
+$
+/, '$1.$2.$3/$4-$5');
+    else if (v.length > 8) v = v.replace(/
 ^
-(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
-      v = v.replace(/\.(\d{3})(\d)/, '.$1/$2');
-      v = v.replace(/(\d{4})(\d)/, '$1-$2');
-      this.value = v;
-    });
+(\d{2})(\d{3})(\d{3})(\d+)
+$
+/, '$1.$2.$3/$4');
+    else if (v.length > 5) v = v.replace(/
+^
+(\d{2})(\d{3})(\d+)
+$
+/, '$1.$2.$3');
+    else if (v.length > 2) v = v.replace(/
+^
+(\d{2})(\d+)
+$
+/, '$1.$2');
+    e.target.value = v;
   }
 
-  function mascaraCEP(campo, callbackBusca) {
-    campo.addEventListener('input', function() {
-      var v = this.value.replace(/\D/g, '').substring(0, 8);
-      if (v.length > 5) v = v.replace(/(\d{5})(\d)/, '$1-$2');
-      this.value = v;
-      if (v.replace(/\D/g, '').length === 8) callbackBusca(v);
-    });
+  function aplicarMascaraCEP(e) {
+    var v = e.target.value.replace(/\D/g, '').substring(0, 8);
+    if (v.length > 5) v = v.replace(/
+^
+(\d{5})(\d+)
+$
+/, '$1-$2');
+    e.target.value = v;
+    if (v.replace(/\D/g, '').length === 8) buscarCep(v);
   }
 
-  function mascaraTelefone(campo) {
-    campo.addEventListener('input', function() {
-      var v = this.value.replace(/\D/g, '').substring(0, 11);
-      if (v.length === 0) { this.value = ''; return; }
-      if (v.length <= 2) {
-        this.value = '(' + v;
-      } else if (v.length <= 6) {
-        this.value = '(' + v.substring(0,2) + ') ' + v.substring(2);
-      } else if (v.length <= 10) {
-        this.value = '(' + v.substring(0,2) + ') ' + v.substring(2,6) + '-' + v.substring(6);
-      } else {
-        this.value = '(' + v.substring(0,2) + ') ' + v.substring(2,7) + '-' + v.substring(7);
-      }
-    });
+  function aplicarMascaraTelefone(e) {
+    var v = e.target.value.replace(/\D/g, '').substring(0, 11);
+    if (v.length === 0) { e.target.value = ''; return; }
+    if (v.length <= 2)       v = '(' + v;
+    else if (v.length <= 6)  v = '(' + v.substring(0,2) + ') ' + v.substring(2);
+    else if (v.length <= 10) v = '(' + v.substring(0,2) + ') ' + v.substring(2,6) + '-' + v.substring(6);
+    else                     v = '(' + v.substring(0,2) + ') ' + v.substring(2,7) + '-' + v.substring(7);
+    e.target.value = v;
   }
 
-  // ─── Consulta CEP ───────────────────────────────────────────
+  // ─── CEP ─────────────────────────────────────────────────────────────────────
+
   function buscarCep(cep) {
     var digits = cep.replace(/\D/g, '');
     if (digits.length !== 8) return;
@@ -367,84 +376,89 @@
       .then(function(d) {
         if (!d.erro) {
           document.getElementById('logradouro').value = d.logradouro || '';
-          document.getElementById('bairro').value = d.bairro || '';
-          document.getElementById('cidade').value = d.localidade || '';
-          document.getElementById('estado').value = d.uf || '';
+          document.getElementById('bairro').value     = d.bairro     || '';
+          document.getElementById('cidade').value     = d.localidade || '';
+          document.getElementById('estado').value     = d.uf         || '';
+          document.getElementById('numero').focus();
         }
-      });
+      })
+      .catch(function() {});
   }
 
-  // ─── Toggle contato operacional ─────────────────────────────
+  // ─── Toggle contato operacional ───────────────────────────────────────────────
+
   function toggleContatoOp(valor) {
     document.getElementById('camposContatoOp').style.display =
       valor === 'Não' ? 'block' : 'none';
   }
 
-  // ─── Helpers ────────────────────────────────────────────────
+  // ─── Helpers ──────────────────────────────────────────────────────────────────
+
   function getCheckboxValues(name) {
     return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
       .map(function(cb) { return cb.value; }).join(', ');
   }
 
-  // ─── Init ───────────────────────────────────────────────────
-  document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('dataPrimeiroContato').value =
-      new Date().toISOString().split('T')[0];
+  // ─── Aplicar máscaras diretamente nos campos ──────────────────────────────────
+  // Como o script está no final do body, os campos já existem no DOM aqui
 
-    mascaraCNPJ(document.getElementById('cnpj'));
-    mascaraCEP(document.getElementById('cep'), buscarCep);
-    mascaraTelefone(document.getElementById('whatsappResponsavel'));
-    mascaraTelefone(document.getElementById('whatsappContatoOp'));
-  });
+  document.getElementById('cnpj').addEventListener('input', aplicarMascaraCNPJ);
+  document.getElementById('cep').addEventListener('input', aplicarMascaraCEP);
+  document.getElementById('whatsappResponsavel').addEventListener('input', aplicarMascaraTelefone);
+  document.getElementById('whatsappContatoOp').addEventListener('input', aplicarMascaraTelefone);
 
-  // ─── Submit ─────────────────────────────────────────────────
+  document.getElementById('dataPrimeiroContato').value =
+    new Date().toISOString().split('T')[0];
+
+  // ─── Submit ───────────────────────────────────────────────────────────────────
+
   document.getElementById('formCadastro').addEventListener('submit', function(e) {
     e.preventDefault();
-    var btn = document.getElementById('btnSubmit');
+    var btn    = document.getElementById('btnSubmit');
     var alerta = document.getElementById('alerta');
     alerta.style.display = 'none';
     btn.disabled = true;
     btn.innerHTML = '<span class="loading"></span> Salvando...';
 
     var dados = {
-      acao: 'salvarEstabelecimento',
-      nomeFantasia: document.getElementById('nomeFantasia').value,
-      razaoSocial: document.getElementById('razaoSocial').value,
-      cnpj: document.getElementById('cnpj').value,
-      segmento: document.getElementById('segmento').value,
-      cep: document.getElementById('cep').value,
-      logradouro: document.getElementById('logradouro').value,
-      numero: document.getElementById('numero').value,
-      complemento: document.getElementById('complemento').value,
-      bairro: document.getElementById('bairro').value,
-      cidade: document.getElementById('cidade').value,
-      estado: document.getElementById('estado').value,
-      pontoReferencia: document.getElementById('pontoReferencia').value,
-      nomeResponsavel: document.getElementById('nomeResponsavel').value,
-      cargoResponsavel: document.getElementById('cargoResponsavel').value,
-      whatsappResponsavel: document.getElementById('whatsappResponsavel').value,
-      emailResponsavel: document.getElementById('emailResponsavel').value,
-      contatoOpMesmo: document.getElementById('contatoOpMesmo').value,
-      nomeContatoOp: document.getElementById('nomeContatoOp').value,
-      cargoContatoOp: document.getElementById('cargoContatoOp').value,
-      whatsappContatoOp: document.getElementById('whatsappContatoOp').value,
-      emailContatoOp: document.getElementById('emailContatoOp').value,
-      diasFuncionamento: getCheckboxValues('dias'),
-      horarioAbertura: document.getElementById('horarioAbertura').value,
-      horarioFechamento: document.getElementById('horarioFechamento').value,
-      feriados: document.getElementById('feriados').value,
-      perfilPublico: document.getElementById('perfilPublico').value,
-      fluxoDiario: document.getElementById('fluxoDiario').value,
-      tempoPermanencia: document.getElementById('tempoPermanencia').value,
-      internet: document.getElementById('internet').value,
-      tipoConexao: document.getElementById('tipoConexao').value,
-      energiaProxima: document.getElementById('energiaProxima').value,
-      obsInfraestrutura: document.getElementById('obsInfraestrutura').value,
-      comoChegou: document.getElementById('comoChegou').value,
+      acao:                  'salvarEstabelecimento',
+      nomeFantasia:          document.getElementById('nomeFantasia').value,
+      razaoSocial:           document.getElementById('razaoSocial').value,
+      cnpj:                  document.getElementById('cnpj').value,
+      segmento:              document.getElementById('segmento').value,
+      cep:                   document.getElementById('cep').value,
+      logradouro:            document.getElementById('logradouro').value,
+      numero:                document.getElementById('numero').value,
+      complemento:           document.getElementById('complemento').value,
+      bairro:                document.getElementById('bairro').value,
+      cidade:                document.getElementById('cidade').value,
+      estado:                document.getElementById('estado').value,
+      pontoReferencia:       document.getElementById('pontoReferencia').value,
+      nomeResponsavel:       document.getElementById('nomeResponsavel').value,
+      cargoResponsavel:      document.getElementById('cargoResponsavel').value,
+      whatsappResponsavel:   document.getElementById('whatsappResponsavel').value,
+      emailResponsavel:      document.getElementById('emailResponsavel').value,
+      contatoOpMesmo:        document.getElementById('contatoOpMesmo').value,
+      nomeContatoOp:         document.getElementById('nomeContatoOp').value,
+      cargoContatoOp:        document.getElementById('cargoContatoOp').value,
+      whatsappContatoOp:     document.getElementById('whatsappContatoOp').value,
+      emailContatoOp:        document.getElementById('emailContatoOp').value,
+      diasFuncionamento:     getCheckboxValues('dias'),
+      horarioAbertura:       document.getElementById('horarioAbertura').value,
+      horarioFechamento:     document.getElementById('horarioFechamento').value,
+      feriados:              document.getElementById('feriados').value,
+      perfilPublico:         document.getElementById('perfilPublico').value,
+      fluxoDiario:           document.getElementById('fluxoDiario').value,
+      tempoPermanencia:      document.getElementById('tempoPermanencia').value,
+      internet:              document.getElementById('internet').value,
+      tipoConexao:           document.getElementById('tipoConexao').value,
+      energiaProxima:        document.getElementById('energiaProxima').value,
+      obsInfraestrutura:     document.getElementById('obsInfraestrutura').value,
+      comoChegou:            document.getElementById('comoChegou').value,
       responsavelProspeccao: document.getElementById('responsavelProspeccao').value,
-      dataPrimeiroContato: document.getElementById('dataPrimeiroContato').value,
-      status: document.getElementById('status').value,
-      observacoesGerais: document.getElementById('observacoesGerais').value
+      dataPrimeiroContato:   document.getElementById('dataPrimeiroContato').value,
+      status:                document.getElementById('status').value,
+      observacoesGerais:     document.getElementById('observacoesGerais').value
     };
 
     fetch(API_URL, { method: 'POST', body: JSON.stringify(dados) })
