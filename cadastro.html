@@ -34,7 +34,14 @@
         <div class="form-group">
           <label>CNPJ <span class="opcional">(opcional)</span></label>
           <input type="text" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18"
-       oninput="alert('digitou no CNPJ');">
+            oninput="
+              var v = this.value.replace(/\D/g,'').substring(0,14);
+              if(v.length>12) v=v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,'$1.$2.$3/$4-$5');
+              else if(v.length>8) v=v.replace(/^(\d{2})(\d{3})(\d{3})(\d+)$/,'$1.$2.$3/$4');
+              else if(v.length>5) v=v.replace(/^(\d{2})(\d{3})(\d+)$/,'$1.$2.$3');
+              else if(v.length>2) v=v.replace(/^(\d{2})(\d+)$/,'$1.$2');
+              this.value=v;
+            ">
         </div>
       </div>
       <div class="form-group">
@@ -64,7 +71,25 @@
       <div class="form-row">
         <div class="form-group">
           <label>CEP <span class="obrigatorio">*</span></label>
-          <input type="text" id="cep" required placeholder="00000-000" maxlength="9">
+          <input type="text" id="cep" required placeholder="00000-000" maxlength="9"
+            oninput="
+              var v = this.value.replace(/\D/g,'').substring(0,8);
+              if(v.length>5) v=v.replace(/^(\d{5})(\d+)$/,'$1-$2');
+              this.value=v;
+              if(v.replace(/\D/g,'').length===8){
+                fetch('https://viacep.com.br/ws/'+v.replace(/\D/g,'')+'/json/')
+                .then(function(r){return r.json();})
+                .then(function(d){
+                  if(!d.erro){
+                    document.getElementById('logradouro').value=d.logradouro||'';
+                    document.getElementById('bairro').value=d.bairro||'';
+                    document.getElementById('cidade').value=d.localidade||'';
+                    document.getElementById('estado').value=d.uf||'';
+                    document.getElementById('numero').focus();
+                  }
+                });
+              }
+            ">
         </div>
         <div class="form-group">
           <label>Número <span class="obrigatorio">*</span></label>
@@ -116,7 +141,16 @@
       <div class="form-row">
         <div class="form-group">
           <label>WhatsApp <span class="obrigatorio">*</span></label>
-          <input type="text" id="whatsappResponsavel" required placeholder="(00) 00000-0000" maxlength="15">
+          <input type="text" id="whatsappResponsavel" required placeholder="(00) 00000-0000" maxlength="15"
+            oninput="
+              var v = this.value.replace(/\D/g,'').substring(0,11);
+              if(v.length===0){this.value='';return;}
+              if(v.length<=2) v='('+v;
+              else if(v.length<=6) v='('+v.substring(0,2)+') '+v.substring(2);
+              else if(v.length<=10) v='('+v.substring(0,2)+') '+v.substring(2,6)+'-'+v.substring(6);
+              else v='('+v.substring(0,2)+') '+v.substring(2,7)+'-'+v.substring(7);
+              this.value=v;
+            ">
         </div>
         <div class="form-group">
           <label>E-mail <span class="opcional">(opcional)</span></label>
@@ -129,7 +163,10 @@
       <h2>👤 Contato Operacional</h2>
       <div class="form-group">
         <label>O contato operacional é o mesmo responsável?</label>
-        <select id="contatoOpMesmo" onchange="toggleContatoOp(this.value)">
+        <select id="contatoOpMesmo" onchange="
+          document.getElementById('camposContatoOp').style.display =
+            this.value === 'Não' ? 'block' : 'none';
+        ">
           <option value="">Selecione...</option>
           <option value="Sim">Sim</option>
           <option value="Não">Não, informar outro contato</option>
@@ -149,7 +186,16 @@
         <div class="form-row">
           <div class="form-group">
             <label>WhatsApp</label>
-            <input type="text" id="whatsappContatoOp" placeholder="(00) 00000-0000" maxlength="15">
+            <input type="text" id="whatsappContatoOp" placeholder="(00) 00000-0000" maxlength="15"
+              oninput="
+                var v = this.value.replace(/\D/g,'').substring(0,11);
+                if(v.length===0){this.value='';return;}
+                if(v.length<=2) v='('+v;
+                else if(v.length<=6) v='('+v.substring(0,2)+') '+v.substring(2);
+                else if(v.length<=10) v='('+v.substring(0,2)+') '+v.substring(2,6)+'-'+v.substring(6);
+                else v='('+v.substring(0,2)+') '+v.substring(2,7)+'-'+v.substring(7);
+                this.value=v;
+              ">
           </div>
           <div class="form-group">
             <label>E-mail <span class="opcional">(opcional)</span></label>
@@ -315,103 +361,16 @@
   </form>
 </div>
 
-<!-- O script vai no final do body, DEPOIS de todo o HTML -->
 <script>
   var API_URL = 'https://script.google.com/macros/s/AKfycbwtA46Q55_pTTPzTh9aXjQh2syF27IYWk0ZRO50KNhCmEdfOQtKqZ8pKazn7l9mvFuAeg/exec';
 
-  // ─── Máscaras ────────────────────────────────────────────────────────────────
-
-  function aplicarMascaraCNPJ(e) {
-    var v = e.target.value.replace(/\D/g, '').substring(0, 14);
-    if (v.length > 12) v = v.replace(/
-^
-(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})
-$
-/, '$1.$2.$3/$4-$5');
-    else if (v.length > 8) v = v.replace(/
-^
-(\d{2})(\d{3})(\d{3})(\d+)
-$
-/, '$1.$2.$3/$4');
-    else if (v.length > 5) v = v.replace(/
-^
-(\d{2})(\d{3})(\d+)
-$
-/, '$1.$2.$3');
-    else if (v.length > 2) v = v.replace(/
-^
-(\d{2})(\d+)
-$
-/, '$1.$2');
-    e.target.value = v;
-  }
-
-  function aplicarMascaraCEP(e) {
-    var v = e.target.value.replace(/\D/g, '').substring(0, 8);
-    if (v.length > 5) v = v.replace(/
-^
-(\d{5})(\d+)
-$
-/, '$1-$2');
-    e.target.value = v;
-    if (v.replace(/\D/g, '').length === 8) buscarCep(v);
-  }
-
-  function aplicarMascaraTelefone(e) {
-    var v = e.target.value.replace(/\D/g, '').substring(0, 11);
-    if (v.length === 0) { e.target.value = ''; return; }
-    if (v.length <= 2)       v = '(' + v;
-    else if (v.length <= 6)  v = '(' + v.substring(0,2) + ') ' + v.substring(2);
-    else if (v.length <= 10) v = '(' + v.substring(0,2) + ') ' + v.substring(2,6) + '-' + v.substring(6);
-    else                     v = '(' + v.substring(0,2) + ') ' + v.substring(2,7) + '-' + v.substring(7);
-    e.target.value = v;
-  }
-
-  // ─── CEP ─────────────────────────────────────────────────────────────────────
-
-  function buscarCep(cep) {
-    var digits = cep.replace(/\D/g, '');
-    if (digits.length !== 8) return;
-    fetch('https://viacep.com.br/ws/' + digits + '/json/')
-      .then(function(r) { return r.json(); })
-      .then(function(d) {
-        if (!d.erro) {
-          document.getElementById('logradouro').value = d.logradouro || '';
-          document.getElementById('bairro').value     = d.bairro     || '';
-          document.getElementById('cidade').value     = d.localidade || '';
-          document.getElementById('estado').value     = d.uf         || '';
-          document.getElementById('numero').focus();
-        }
-      })
-      .catch(function() {});
-  }
-
-  // ─── Toggle contato operacional ───────────────────────────────────────────────
-
-  function toggleContatoOp(valor) {
-    document.getElementById('camposContatoOp').style.display =
-      valor === 'Não' ? 'block' : 'none';
-  }
-
-  // ─── Helpers ──────────────────────────────────────────────────────────────────
+  document.getElementById('dataPrimeiroContato').value =
+    new Date().toISOString().split('T')[0];
 
   function getCheckboxValues(name) {
     return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
       .map(function(cb) { return cb.value; }).join(', ');
   }
-
-  // ─── Aplicar máscaras diretamente nos campos ──────────────────────────────────
-  // Como o script está no final do body, os campos já existem no DOM aqui
-
-  document.getElementById('cnpj').addEventListener('input', aplicarMascaraCNPJ);
-  document.getElementById('cep').addEventListener('input', aplicarMascaraCEP);
-  document.getElementById('whatsappResponsavel').addEventListener('input', aplicarMascaraTelefone);
-  document.getElementById('whatsappContatoOp').addEventListener('input', aplicarMascaraTelefone);
-
-  document.getElementById('dataPrimeiroContato').value =
-    new Date().toISOString().split('T')[0];
-
-  // ─── Submit ───────────────────────────────────────────────────────────────────
 
   document.getElementById('formCadastro').addEventListener('submit', function(e) {
     e.preventDefault();
