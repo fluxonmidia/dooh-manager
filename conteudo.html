@@ -18,19 +18,16 @@
 
 <div class="container">
   <div id="alerta" class="alerta"></div>
-
   <form id="formConteudo">
 
     <div class="card">
       <h2>📋 Identificação</h2>
-
       <div class="form-group">
         <label>Estabelecimento <span class="obrigatorio">*</span></label>
         <select id="estabelecimento" required>
           <option value="">Carregando lista...</option>
         </select>
       </div>
-
       <div class="form-row">
         <div class="form-group">
           <label>Nome do Solicitante <span class="obrigatorio">*</span></label>
@@ -41,16 +38,23 @@
           <input type="text" id="cargo" required>
         </div>
       </div>
-
       <div class="form-group">
         <label>Contato (WhatsApp ou e-mail) <span class="obrigatorio">*</span></label>
-        <input type="text" id="contato" required>
+        <input type="text" id="contato" required placeholder="(00) 00000-0000" maxlength="15"
+          oninput="
+            var v = this.value.replace(/\D/g,'').substring(0,11);
+            if(v.length===0){this.value='';return;}
+            if(v.length<=2) v='('+v;
+            else if(v.length<=6) v='('+v.substring(0,2)+') '+v.substring(2);
+            else if(v.length<=10) v='('+v.substring(0,2)+') '+v.substring(2,6)+'-'+v.substring(6);
+            else v='('+v.substring(0,2)+') '+v.substring(2,7)+'-'+v.substring(7);
+            this.value=v;
+          ">
       </div>
     </div>
 
     <div class="card">
       <h2>🧾 Tipo de Solicitação</h2>
-
       <div class="form-group">
         <label>Tipo de solicitação <span class="obrigatorio">*</span></label>
         <select id="tipoSolicitacao" required>
@@ -61,7 +65,6 @@
           <option>Remover conteúdo definitivamente</option>
         </select>
       </div>
-
       <div class="form-group">
         <label>Tipo de conteúdo <span class="obrigatorio">*</span></label>
         <select id="tipoConteudo" required>
@@ -78,7 +81,6 @@
           <option>Outro</option>
         </select>
       </div>
-
       <div class="form-group">
         <label>Título / Nome da peça <span class="obrigatorio">*</span></label>
         <input type="text" id="tituloPeca" required>
@@ -87,16 +89,19 @@
 
     <div class="card">
       <h2>✏️ Conteúdo</h2>
-
       <div class="form-group">
         <label>O estabelecimento vai enviar o material pronto? <span class="obrigatorio">*</span></label>
-        <select id="materialPronto" required onchange="toggleMaterial(this.value)">
+        <select id="materialPronto" required onchange="
+          document.getElementById('campoTipoArquivo').style.display =
+            this.value.indexOf('Sim') === 0 ? 'block' : 'none';
+          document.getElementById('camposCriacao').style.display =
+            this.value.indexOf('Não') === 0 ? 'block' : 'none';
+        ">
           <option value="">Selecione...</option>
           <option>Sim, vou enviar o arquivo pronto</option>
           <option>Não, preciso que vocês criem a arte</option>
         </select>
       </div>
-
       <div class="form-group" id="campoTipoArquivo" style="display:none;">
         <label>Tipo de arquivo enviado</label>
         <select id="tipoArquivo">
@@ -107,23 +112,19 @@
           <option>Outro</option>
         </select>
       </div>
-
       <div id="camposCriacao" style="display:none;">
         <div class="form-group">
           <label>Texto principal da peça</label>
           <textarea id="textoPrincipal"></textarea>
         </div>
-
         <div class="form-group">
           <label>Informações adicionais</label>
           <textarea id="informacoesAdicionais"></textarea>
         </div>
-
         <div class="form-group">
           <label>Referência visual <span class="opcional">(opcional)</span></label>
           <textarea id="referenciaVisual"></textarea>
         </div>
-
         <div class="form-group">
           <label>Cores, fontes ou elementos da marca <span class="opcional">(opcional)</span></label>
           <textarea id="coresFontes"></textarea>
@@ -133,7 +134,6 @@
 
     <div class="card">
       <h2>📺 Veiculação</h2>
-
       <div class="form-row">
         <div class="form-group">
           <label>Data de início <span class="obrigatorio">*</span></label>
@@ -141,19 +141,20 @@
         </div>
         <div class="form-group">
           <label>Possui data de término? <span class="obrigatorio">*</span></label>
-          <select id="temDataTermino" required onchange="toggleTermino(this.value)">
+          <select id="temDataTermino" required onchange="
+            document.getElementById('campoDataTermino').style.display =
+              this.value === 'Sim' ? 'block' : 'none';
+          ">
             <option value="">Selecione...</option>
             <option>Sim</option>
             <option>Não, deixar no ar até eu pedir para retirar</option>
           </select>
         </div>
       </div>
-
       <div class="form-group" id="campoDataTermino" style="display:none;">
         <label>Data de término</label>
         <input type="date" id="dataTermino">
       </div>
-
       <div class="form-group">
         <label>Em quais telas deve aparecer? <span class="obrigatorio">*</span></label>
         <div class="checkbox-group">
@@ -165,11 +166,13 @@
           <label class="checkbox-item"><input type="checkbox" name="telas" value="Todas as telas"> Todas as telas</label>
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-group">
           <label>Horário de exibição</label>
-          <select id="horarioExibicao">
+          <select id="horarioExibicao" onchange="
+            document.getElementById('campoHorarioEspecifico').style.display =
+              this.value === 'Horário específico' ? 'block' : 'none';
+          ">
             <option value="">Selecione...</option>
             <option>Dia todo</option>
             <option>Apenas manhã</option>
@@ -183,7 +186,6 @@
           <input type="text" id="horarioEspecifico" placeholder="Ex.: 11h às 14h">
         </div>
       </div>
-
       <div class="form-group">
         <label>Nível de urgência <span class="obrigatorio">*</span></label>
         <select id="urgencia" required>
@@ -198,12 +200,10 @@
 
     <div class="card">
       <h2>📝 Observações e Política</h2>
-
       <div class="form-group">
         <label>Observações adicionais <span class="opcional">(opcional)</span></label>
         <textarea id="observacoes"></textarea>
       </div>
-
       <div class="form-group">
         <label>Confirmações</label>
         <div class="checkbox-group">
@@ -222,85 +222,65 @@
 <script>
   var API_URL = 'https://script.google.com/macros/s/AKfycbwtA46Q55_pTTPzTh9aXjQh2syF27IYWk0ZRO50KNhCmEdfOQtKqZ8pKazn7l9mvFuAeg/exec';
 
+  document.getElementById('dataInicio').value = new Date().toISOString().split('T')[0];
+
+  fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: 'getEstabelecimentos' }) })
+    .then(function(r) { return r.json(); })
+    .then(function(lista) {
+      var select = document.getElementById('estabelecimento');
+      select.innerHTML = '<option value="">Selecione...</option>';
+      if (!lista || lista.length === 0) {
+        select.innerHTML = '<option value="">Nenhum estabelecimento cadastrado</option>';
+        return;
+      }
+      lista.forEach(function(est) {
+        var opt = document.createElement('option');
+        opt.value = est.nome;
+        opt.textContent = est.nome;
+        select.appendChild(opt);
+      });
+    })
+    .catch(function() {
+      document.getElementById('estabelecimento').innerHTML = '<option value="">Erro ao carregar</option>';
+    });
+
   function getCheckboxValues(name) {
     return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
       .map(function(cb) { return cb.value; }).join(', ');
   }
 
-  function toggleMaterial(valor) {
-    document.getElementById('campoTipoArquivo').style.display =
-      valor.indexOf('Sim') === 0 ? 'block' : 'none';
-    document.getElementById('camposCriacao').style.display =
-      valor.indexOf('Não') === 0 ? 'block' : 'none';
-  }
-
-  function toggleTermino(valor) {
-    document.getElementById('campoDataTermino').style.display =
-      valor === 'Sim' ? 'block' : 'none';
-  }
-
-  document.getElementById('horarioExibicao').addEventListener('change', function() {
-    document.getElementById('campoHorarioEspecifico').style.display =
-      this.value === 'Horário específico' ? 'block' : 'none';
-  });
-
-  document.addEventListener('DOMContentLoaded', function() {
-    var hoje = new Date().toISOString().split('T')[0];
-    document.getElementById('dataInicio').value = hoje;
-
-    fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: 'getEstabelecimentos' }) })
-      .then(function(r) { return r.json(); })
-      .then(function(lista) {
-        var select = document.getElementById('estabelecimento');
-        select.innerHTML = '<option value="">Selecione...</option>';
-        if (!lista || lista.length === 0) {
-          select.innerHTML = '<option value="">Nenhum estabelecimento cadastrado</option>';
-          return;
-        }
-        lista.forEach(function(est) {
-          var opt = document.createElement('option');
-          opt.value = est.nome;
-          opt.textContent = est.nome;
-          select.appendChild(opt);
-        });
-      })
-      .catch(function() {
-        document.getElementById('estabelecimento').innerHTML = '<option value="">Erro ao carregar</option>';
-      });
-  });
-
   document.getElementById('formConteudo').addEventListener('submit', function(e) {
     e.preventDefault();
-    var btn = document.getElementById('btnSubmit');
+    var btn    = document.getElementById('btnSubmit');
     var alerta = document.getElementById('alerta');
     alerta.style.display = 'none';
     btn.disabled = true;
     btn.innerHTML = '<span class="loading"></span> Enviando...';
 
     var dados = {
-      acao: 'salvarConteudo',
-      estabelecimento: document.getElementById('estabelecimento').value,
-      solicitante: document.getElementById('solicitante').value,
-      cargo: document.getElementById('cargo').value,
-      contato: document.getElementById('contato').value,
-      tipoSolicitacao: document.getElementById('tipoSolicitacao').value,
-      tipoConteudo: document.getElementById('tipoConteudo').value,
-      tituloPeca: document.getElementById('tituloPeca').value,
-      materialPronto: document.getElementById('materialPronto').value,
-      tipoArquivo: document.getElementById('tipoArquivo').value,
-      textoPrincipal: document.getElementById('textoPrincipal').value,
+      acao:                  'salvarConteudo',
+      estabelecimento:       document.getElementById('estabelecimento').value,
+      solicitante:           document.getElementById('solicitante').value,
+      cargo:                 document.getElementById('cargo').value,
+      contato:               document.getElementById('contato').value,
+      tipoSolicitacao:       document.getElementById('tipoSolicitacao').value,
+      tipoConteudo:          document.getElementById('tipoConteudo').value,
+      tituloPeca:            document.getElementById('tituloPeca').value,
+      materialPronto:        document.getElementById('materialPronto').value,
+      tipoArquivo:           document.getElementById('tipoArquivo').value,
+      textoPrincipal:        document.getElementById('textoPrincipal').value,
       informacoesAdicionais: document.getElementById('informacoesAdicionais').value,
-      referenciaVisual: document.getElementById('referenciaVisual').value,
-      coresFontes: document.getElementById('coresFontes').value,
-      dataInicio: document.getElementById('dataInicio').value,
-      temDataTermino: document.getElementById('temDataTermino').value,
-      dataTermino: document.getElementById('dataTermino').value,
-      telas: getCheckboxValues('telas'),
-      horarioExibicao: document.getElementById('horarioExibicao').value,
-      horarioEspecifico: document.getElementById('horarioEspecifico').value,
-      urgencia: document.getElementById('urgencia').value,
-      observacoes: document.getElementById('observacoes').value,
-      confirmacaoPolitica: document.getElementById('confirmacaoPolitica').checked ? 'Sim' : 'Não'
+      referenciaVisual:      document.getElementById('referenciaVisual').value,
+      coresFontes:           document.getElementById('coresFontes').value,
+      dataInicio:            document.getElementById('dataInicio').value,
+      temDataTermino:        document.getElementById('temDataTermino').value,
+      dataTermino:           document.getElementById('dataTermino').value,
+      telas:                 getCheckboxValues('telas'),
+      horarioExibicao:       document.getElementById('horarioExibicao').value,
+      horarioEspecifico:     document.getElementById('horarioEspecifico').value,
+      urgencia:              document.getElementById('urgencia').value,
+      observacoes:           document.getElementById('observacoes').value,
+      confirmacaoPolitica:   document.getElementById('confirmacaoPolitica').checked ? 'Sim' : 'Não'
     };
 
     fetch(API_URL, { method: 'POST', body: JSON.stringify(dados) })
@@ -310,6 +290,10 @@
           alerta.className = 'alerta sucesso';
           alerta.innerHTML = '✅ ' + resultado.mensagem + ' | ID: ' + resultado.id;
           document.getElementById('formConteudo').reset();
+          document.getElementById('campoTipoArquivo').style.display = 'none';
+          document.getElementById('camposCriacao').style.display = 'none';
+          document.getElementById('campoDataTermino').style.display = 'none';
+          document.getElementById('campoHorarioEspecifico').style.display = 'none';
         } else {
           alerta.className = 'alerta erro';
           alerta.innerHTML = '❌ ' + resultado.mensagem;
@@ -328,6 +312,5 @@
       });
   });
 </script>
-
 </body>
 </html>
