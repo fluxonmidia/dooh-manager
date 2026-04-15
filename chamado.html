@@ -18,19 +18,16 @@
 
 <div class="container">
   <div id="alerta" class="alerta"></div>
-
   <form id="formChamado">
 
     <div class="card">
       <h2>📋 Identificação</h2>
-
       <div class="form-group">
         <label>Estabelecimento <span class="obrigatorio">*</span></label>
         <select id="estabelecimento" required>
           <option value="">Carregando lista...</option>
         </select>
       </div>
-
       <div class="form-row">
         <div class="form-group">
           <label>Nome de quem abre o chamado <span class="obrigatorio">*</span></label>
@@ -41,16 +38,23 @@
           <input type="text" id="cargo" required>
         </div>
       </div>
-
       <div class="form-group">
         <label>WhatsApp para contato <span class="obrigatorio">*</span></label>
-        <input type="text" id="whatsappContato" required placeholder="(00) 00000-0000">
+        <input type="text" id="whatsappContato" required placeholder="(00) 00000-0000" maxlength="15"
+          oninput="
+            var v = this.value.replace(/\D/g,'').substring(0,11);
+            if(v.length===0){this.value='';return;}
+            if(v.length<=2) v='('+v;
+            else if(v.length<=6) v='('+v.substring(0,2)+') '+v.substring(2);
+            else if(v.length<=10) v='('+v.substring(0,2)+') '+v.substring(2,6)+'-'+v.substring(6);
+            else v='('+v.substring(0,2)+') '+v.substring(2,7)+'-'+v.substring(7);
+            this.value=v;
+          ">
       </div>
     </div>
 
     <div class="card">
       <h2>🚨 Problema Reportado</h2>
-
       <div class="form-group">
         <label>Qual tela/ponto está com problema? <span class="obrigatorio">*</span></label>
         <select id="telaProblema" required>
@@ -64,7 +68,6 @@
           <option>Não sei informar</option>
         </select>
       </div>
-
       <div class="form-group">
         <label>Quando o problema começou? <span class="obrigatorio">*</span></label>
         <select id="quandoComecou" required>
@@ -76,7 +79,6 @@
           <option>Não sei dizer</option>
         </select>
       </div>
-
       <div class="form-group">
         <label>Tipo de problema <span class="obrigatorio">*</span></label>
         <select id="tipoProblema" required>
@@ -93,12 +95,10 @@
           <option>Outro</option>
         </select>
       </div>
-
       <div class="form-group">
         <label>Descreva o problema com suas palavras <span class="obrigatorio">*</span></label>
         <textarea id="descricaoProblema" required></textarea>
       </div>
-
       <div class="form-group">
         <label>O problema é constante ou vai e volta? <span class="obrigatorio">*</span></label>
         <select id="constanteIntermitente" required>
@@ -111,7 +111,6 @@
 
     <div class="card">
       <h2>🔌 Checklist Básico</h2>
-
       <div class="form-group">
         <label>A TV está conectada na tomada? <span class="obrigatorio">*</span></label>
         <select id="tvTomada" required>
@@ -121,7 +120,6 @@
           <option>Não sei</option>
         </select>
       </div>
-
       <div class="form-group">
         <label>A TV está ligada no controle/botão? <span class="obrigatorio">*</span></label>
         <select id="tvLigada" required>
@@ -131,7 +129,6 @@
           <option>Não sei</option>
         </select>
       </div>
-
       <div class="form-group">
         <label>O cabo do player está conectado na TV? <span class="obrigatorio">*</span></label>
         <select id="caboConectado" required>
@@ -141,7 +138,6 @@
           <option>Não sei</option>
         </select>
       </div>
-
       <div class="form-group">
         <label>A internet do local está funcionando normalmente? <span class="obrigatorio">*</span></label>
         <select id="internetOk" required>
@@ -151,7 +147,6 @@
           <option>Não sei</option>
         </select>
       </div>
-
       <div class="form-group">
         <label>Já tentou desligar e ligar novamente o equipamento? <span class="obrigatorio">*</span></label>
         <select id="tentouReligar" required>
@@ -164,12 +159,10 @@
 
     <div class="card">
       <h2>📅 Atendimento</h2>
-
       <div class="form-group">
         <label>Melhor horário para contato / atendimento remoto <span class="obrigatorio">*</span></label>
         <input type="text" id="melhorHorario" required placeholder="Ex.: manhã, das 9h às 11h">
       </div>
-
       <div class="form-group">
         <label>Autoriza acesso remoto ao equipamento, se necessário? <span class="obrigatorio">*</span></label>
         <select id="autorizaAcesso" required>
@@ -178,7 +171,6 @@
           <option>Não autorizo</option>
         </select>
       </div>
-
       <div class="form-group">
         <label>Observações adicionais <span class="opcional">(opcional)</span></label>
         <textarea id="observacoesAdicionais"></textarea>
@@ -192,55 +184,53 @@
 <script>
   var API_URL = 'https://script.google.com/macros/s/AKfycbwtA46Q55_pTTPzTh9aXjQh2syF27IYWk0ZRO50KNhCmEdfOQtKqZ8pKazn7l9mvFuAeg/exec';
 
-  document.addEventListener('DOMContentLoaded', function() {
-    fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: 'getEstabelecimentos' }) })
-      .then(function(r) { return r.json(); })
-      .then(function(lista) {
-        var select = document.getElementById('estabelecimento');
-        select.innerHTML = '<option value="">Selecione...</option>';
-        if (!lista || lista.length === 0) {
-          select.innerHTML = '<option value="">Nenhum estabelecimento cadastrado</option>';
-          return;
-        }
-        lista.forEach(function(est) {
-          var opt = document.createElement('option');
-          opt.value = est.nome;
-          opt.textContent = est.nome;
-          select.appendChild(opt);
-        });
-      })
-      .catch(function() {
-        document.getElementById('estabelecimento').innerHTML = '<option value="">Erro ao carregar</option>';
+  fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: 'getEstabelecimentos' }) })
+    .then(function(r) { return r.json(); })
+    .then(function(lista) {
+      var select = document.getElementById('estabelecimento');
+      select.innerHTML = '<option value="">Selecione...</option>';
+      if (!lista || lista.length === 0) {
+        select.innerHTML = '<option value="">Nenhum estabelecimento cadastrado</option>';
+        return;
+      }
+      lista.forEach(function(est) {
+        var opt = document.createElement('option');
+        opt.value = est.nome;
+        opt.textContent = est.nome;
+        select.appendChild(opt);
       });
-  });
+    })
+    .catch(function() {
+      document.getElementById('estabelecimento').innerHTML = '<option value="">Erro ao carregar</option>';
+    });
 
   document.getElementById('formChamado').addEventListener('submit', function(e) {
     e.preventDefault();
-    var btn = document.getElementById('btnSubmit');
+    var btn    = document.getElementById('btnSubmit');
     var alerta = document.getElementById('alerta');
     alerta.style.display = 'none';
     btn.disabled = true;
     btn.innerHTML = '<span class="loading"></span> Enviando...';
 
     var dados = {
-      acao: 'salvarChamado',
-      estabelecimento: document.getElementById('estabelecimento').value,
-      nomeSolicitante: document.getElementById('nomeSolicitante').value,
-      cargo: document.getElementById('cargo').value,
-      whatsappContato: document.getElementById('whatsappContato').value,
-      telaProblema: document.getElementById('telaProblema').value,
-      quandoComecou: document.getElementById('quandoComecou').value,
-      tipoProblema: document.getElementById('tipoProblema').value,
-      descricaoProblema: document.getElementById('descricaoProblema').value,
-      constanteIntermitente: document.getElementById('constanteIntermitente').value,
-      tvTomada: document.getElementById('tvTomada').value,
-      tvLigada: document.getElementById('tvLigada').value,
-      caboConectado: document.getElementById('caboConectado').value,
-      internetOk: document.getElementById('internetOk').value,
-      tentouReligar: document.getElementById('tentouReligar').value,
-      melhorHorario: document.getElementById('melhorHorario').value,
-      autorizaAcesso: document.getElementById('autorizaAcesso').value,
-      observacoesAdicionais: document.getElementById('observacoesAdicionais').value
+      acao:                   'salvarChamado',
+      estabelecimento:        document.getElementById('estabelecimento').value,
+      nomeSolicitante:        document.getElementById('nomeSolicitante').value,
+      cargo:                  document.getElementById('cargo').value,
+      whatsappContato:        document.getElementById('whatsappContato').value,
+      telaProblema:           document.getElementById('telaProblema').value,
+      quandoComecou:          document.getElementById('quandoComecou').value,
+      tipoProblema:           document.getElementById('tipoProblema').value,
+      descricaoProblema:      document.getElementById('descricaoProblema').value,
+      constanteIntermitente:  document.getElementById('constanteIntermitente').value,
+      tvTomada:               document.getElementById('tvTomada').value,
+      tvLigada:               document.getElementById('tvLigada').value,
+      caboConectado:          document.getElementById('caboConectado').value,
+      internetOk:             document.getElementById('internetOk').value,
+      tentouReligar:          document.getElementById('tentouReligar').value,
+      melhorHorario:          document.getElementById('melhorHorario').value,
+      autorizaAcesso:         document.getElementById('autorizaAcesso').value,
+      observacoesAdicionais:  document.getElementById('observacoesAdicionais').value
     };
 
     fetch(API_URL, { method: 'POST', body: JSON.stringify(dados) })
@@ -268,6 +258,5 @@
       });
   });
 </script>
-
 </body>
 </html>
