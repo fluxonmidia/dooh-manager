@@ -41,16 +41,15 @@
 
   <div id="alerta" class="alerta"></div>
 
-  <!-- ═══ ABA NOVO CADASTRO ═══ -->
+  <!-- NOVO CADASTRO -->
   <div id="tab-novo" class="tab-conteudo ativo">
-
     <div id="infoEdicao" class="info-edicao" style="display:none;">
       Editando: <span id="infoEdicaoNome"></span> &nbsp;|&nbsp; ID: <span id="infoEdicaoId"></span>
       <button type="button" class="btn-secundario" onclick="cancelarEdicao()">✕ Cancelar edição</button>
     </div>
 
     <form id="formCadastro">
-
+      <!-- Dados -->
       <div class="card">
         <h2>📋 Dados do Estabelecimento</h2>
         <div class="form-group">
@@ -59,11 +58,11 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Razão Social <span class="opcional">(opcional)</span></label>
+            <label>Razão Social</label>
             <input type="text" id="razaoSocial">
           </div>
           <div class="form-group">
-            <label>CNPJ <span class="opcional">(opcional)</span></label>
+            <label>CNPJ</label>
             <input type="text" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18"
               oninput="
                 var v=this.value.replace(/\D/g,'').substring(0,14);
@@ -97,6 +96,7 @@
         </div>
       </div>
 
+      <!-- Endereço -->
       <div class="card">
         <h2>📍 Endereço</h2>
         <div class="form-row">
@@ -133,7 +133,7 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Complemento <span class="opcional">(opcional)</span></label>
+            <label>Complemento</label>
             <input type="text" id="complemento">
           </div>
           <div class="form-group">
@@ -152,11 +152,12 @@
           </div>
         </div>
         <div class="form-group">
-          <label>Ponto de Referência <span class="opcional">(opcional)</span></label>
+          <label>Ponto de Referência</label>
           <input type="text" id="pontoReferencia">
         </div>
       </div>
 
+      <!-- Responsável -->
       <div class="card">
         <h2>👤 Responsável</h2>
         <div class="form-row">
@@ -171,7 +172,7 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>WhatsApp <span class="obrigatorio">*</span></label>
+            <label>WhatsApp Responsável <span class="obrigatorio">*</span></label>
             <input type="text" id="whatsappResponsavel" required placeholder="(00) 00000-0000" maxlength="15"
               oninput="
                 var v=this.value.replace(/\D/g,'').substring(0,11);
@@ -184,16 +185,17 @@
               ">
           </div>
           <div class="form-group">
-            <label>E-mail <span class="opcional">(opcional)</span></label>
+            <label>Email Responsável</label>
             <input type="email" id="emailResponsavel">
           </div>
         </div>
       </div>
 
+      <!-- Contato Operacional -->
       <div class="card">
         <h2>👤 Contato Operacional</h2>
         <div class="form-group">
-          <label>O contato operacional é o mesmo responsável?</label>
+          <label>Contato Operacional Mesmo?</label>
           <select id="contatoOpMesmo" onchange="
             document.getElementById('camposContatoOp').style.display=
               this.value==='Não'?'block':'none';
@@ -206,17 +208,17 @@
         <div id="camposContatoOp" style="display:none;">
           <div class="form-row">
             <div class="form-group">
-              <label>Nome do Contato Operacional</label>
+              <label>Nome Contato Op.</label>
               <input type="text" id="nomeContatoOp">
             </div>
             <div class="form-group">
-              <label>Cargo</label>
+              <label>Cargo Contato Op.</label>
               <input type="text" id="cargoContatoOp">
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>WhatsApp</label>
+              <label>WhatsApp Contato Op.</label>
               <input type="text" id="whatsappContatoOp" placeholder="(00) 00000-0000" maxlength="15"
                 oninput="
                   var v=this.value.replace(/\D/g,'').substring(0,11);
@@ -229,17 +231,18 @@
                 ">
             </div>
             <div class="form-group">
-              <label>E-mail <span class="opcional">(opcional)</span></label>
+              <label>Email Contato Op.</label>
               <input type="email" id="emailContatoOp">
             </div>
           </div>
         </div>
       </div>
 
+      <!-- Funcionamento -->
       <div class="card">
         <h2>⏰ Funcionamento</h2>
         <div class="form-group">
-          <label>Dias de Funcionamento <span class="obrigatorio">*</span></label>
+          <label>Dias de Funcionamento</label>
           <div class="checkbox-group">
             <label class="checkbox-item"><input type="checkbox" name="dias" value="Segunda"> Segunda-feira</label>
             <label class="checkbox-item"><input type="checkbox" name="dias" value="Terça"> Terça-feira</label>
@@ -252,16 +255,16 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Horário de Abertura <span class="obrigatorio">*</span></label>
-            <input type="time" id="horarioAbertura" required>
+            <label>Horário Abertura</label>
+            <input type="time" id="horarioAbertura">
           </div>
           <div class="form-group">
-            <label>Horário de Fechamento <span class="obrigatorio">*</span></label>
-            <input type="time" id="horarioFechamento" required>
+            <label>Horário Fechamento</label>
+            <input type="time" id="horarioFechamento">
           </div>
         </div>
         <div class="form-group">
-          <label>Funciona em feriados?</label>
+          <label>Feriados</label>
           <select id="feriados">
             <option value="">Selecione...</option>
             <option>Sim, normalmente</option>
@@ -272,11 +275,12 @@
         </div>
       </div>
 
+      <!-- Perfil -->
       <div class="card">
         <h2>📊 Perfil do Público</h2>
         <div class="form-group">
-          <label>Perfil do Público <span class="obrigatorio">*</span></label>
-          <select id="perfilPublico" required>
+          <label>Perfil Público</label>
+          <select id="perfilPublico">
             <option value="">Selecione...</option>
             <option>Classe A/B</option>
             <option>Classe B/C</option>
@@ -286,7 +290,7 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Fluxo Diário Estimado</label>
+            <label>Fluxo Diário</label>
             <select id="fluxoDiario">
               <option value="">Selecione...</option>
               <option>Até 50 pessoas</option>
@@ -297,7 +301,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label>Tempo Médio de Permanência</label>
+            <label>Tempo Permanência</label>
             <select id="tempoPermanencia">
               <option value="">Selecione...</option>
               <option>Menos de 5 minutos</option>
@@ -310,11 +314,12 @@
         </div>
       </div>
 
+      <!-- Infra -->
       <div class="card">
         <h2>🔌 Infraestrutura</h2>
         <div class="form-group">
-          <label>Possui internet? <span class="obrigatorio">*</span></label>
-          <select id="internet" required>
+          <label>Internet</label>
+          <select id="internet">
             <option value="">Selecione...</option>
             <option>Sim</option>
             <option>Não</option>
@@ -322,7 +327,7 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Tipo de Conexão</label>
+          <label>Tipo Conexão</label>
           <select id="tipoConexao">
             <option value="">Selecione...</option>
             <option>Wi-Fi</option>
@@ -332,7 +337,7 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Energia elétrica próxima ao ponto desejado?</label>
+          <label>Energia Próxima</label>
           <select id="energiaProxima">
             <option value="">Selecione...</option>
             <option>Sim</option>
@@ -341,16 +346,17 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Observações de Infraestrutura <span class="opcional">(opcional)</span></label>
+          <label>Obs Infraestrutura</label>
           <textarea id="obsInfraestrutura"></textarea>
         </div>
       </div>
 
+      <!-- Prospecção -->
       <div class="card">
         <h2>📣 Prospecção</h2>
         <div class="form-group">
-          <label>Como chegou até nós? <span class="obrigatorio">*</span></label>
-          <select id="comoChegou" required>
+          <label>Como Chegou</label>
+          <select id="comoChegou">
             <option value="">Selecione...</option>
             <option>Indicação</option>
             <option>Prospecção ativa</option>
@@ -362,17 +368,17 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Responsável pela Prospecção <span class="obrigatorio">*</span></label>
-            <input type="text" id="responsavelProspeccao" required>
+            <label>Responsável Prospecção</label>
+            <input type="text" id="responsavelProspeccao">
           </div>
           <div class="form-group">
-            <label>Data do Primeiro Contato <span class="obrigatorio">*</span></label>
-            <input type="date" id="dataPrimeiroContato" required>
+            <label>Data Primeiro Contato</label>
+            <input type="date" id="dataPrimeiroContato">
           </div>
         </div>
         <div class="form-group">
-          <label>Status <span class="obrigatorio">*</span></label>
-          <select id="status" required>
+          <label>Status</label>
+          <select id="status">
             <option value="">Selecione...</option>
             <option>Lead</option>
             <option>Em negociação</option>
@@ -383,7 +389,7 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Observações Gerais <span class="opcional">(opcional)</span></label>
+          <label>Observações Gerais</label>
           <textarea id="observacoesGerais"></textarea>
         </div>
       </div>
@@ -392,18 +398,18 @@
     </form>
   </div>
 
-  <!-- ═══ ABA CONSULTA ═══ -->
+  <!-- CONSULTA -->
   <div id="tab-consulta" class="tab-conteudo">
     <div class="card">
       <h2>📚 Estabelecimentos Cadastrados</h2>
       <div class="form-row">
         <div class="form-group">
           <label>Filtrar por nome</label>
-          <input type="text" id="filtroNome" placeholder="Digite parte do nome">
+          <input type="text" id="filtroNome">
         </div>
         <div class="form-group">
           <label>Filtrar por cidade</label>
-          <input type="text" id="filtroCidade" placeholder="Digite parte da cidade">
+          <input type="text" id="filtroCidade">
         </div>
       </div>
       <table class="listagem" id="tabelaEstabelecimentos">
@@ -411,7 +417,7 @@
           <tr>
             <th>ID</th>
             <th>Nome Fantasia</th>
-            <th>Cidade / UF</th>
+            <th>Cidade/UF</th>
             <th>Segmento</th>
             <th>Status</th>
           </tr>
@@ -420,15 +426,13 @@
           <tr><td colspan="5">Carregando...</td></tr>
         </tbody>
       </table>
-      <div class="hint" style="margin-top:8px;">Clique em uma linha para editar o cadastro.</div>
+      <div class="hint" style="margin-top:8px;">Clique em uma linha para editar.</div>
     </div>
   </div>
-
 </div>
 
 <script>
-  var API_URL = 'https://script.google.com/macros/s/AKfycbwtA46Q55_pTTPzTh9aXjQh2syF27IYWk0ZRO50KNhCmEdfOQtKqZ8pKazn7l9mvFuAeg/exec';
-
+  var API_URL = 'COLE_AQUI_A_URL_DO_SEU_APPS_SCRIPT';
   var linhaEmEdicao = null;
   var idEmEdicao    = null;
   var listaGlobal   = [];
@@ -436,261 +440,245 @@
   document.getElementById('dataPrimeiroContato').value =
     new Date().toISOString().split('T')[0];
 
-  // ─── Abas ───────────────────────────────────────────────────
-  document.querySelectorAll('.tab-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
+  document.querySelectorAll('.tab-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
       trocarTab(this.dataset.tab);
     });
   });
 
-  function trocarTab(idTab) {
-    document.querySelectorAll('.tab-btn').forEach(function(b) {
-      b.classList.toggle('ativo', b.dataset.tab === idTab);
+  function trocarTab(idTab){
+    document.querySelectorAll('.tab-btn').forEach(function(b){
+      b.classList.toggle('ativo', b.dataset.tab===idTab);
     });
-    document.querySelectorAll('.tab-conteudo').forEach(function(div) {
-      div.classList.toggle('ativo', div.id === idTab);
+    document.querySelectorAll('.tab-conteudo').forEach(function(div){
+      div.classList.toggle('ativo', div.id===idTab);
     });
-    if (idTab === 'tab-consulta') carregarLista();
+    if(idTab==='tab-consulta') carregarLista();
   }
 
-  // ─── Helpers ────────────────────────────────────────────────
-  function getCheckboxValues(name) {
-    return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
-      .map(function(cb) { return cb.value; }).join(', ');
+  function getCheckboxValues(name){
+    return Array.from(document.querySelectorAll('input[name="'+name+'"]:checked'))
+      .map(function(cb){return cb.value;}).join(', ');
   }
 
-  function setCheckboxValues(name, csv) {
-    var valores = (csv || '').split(',').map(function(v) { return v.trim(); });
-    document.querySelectorAll('input[name="' + name + '"]').forEach(function(cb) {
-      cb.checked = valores.indexOf(cb.value) !== -1;
+  function setCheckboxValues(name, csv){
+    var valores=(csv||'').split(',').map(function(v){return v.trim();});
+    document.querySelectorAll('input[name="'+name+'"]').forEach(function(cb){
+      cb.checked = valores.indexOf(cb.value)!==-1;
     });
   }
 
-  function setSelect(id, valor) {
-    var el = document.getElementById(id);
-    if (!el) return;
-    for (var i = 0; i < el.options.length; i++) {
-      if (el.options[i].value === valor || el.options[i].text === valor) {
-        el.selectedIndex = i;
-        return;
-      }
-    }
-    el.value = '';
+  function setSelect(id, valor){
+    var el=document.getElementById(id);
+    if(!el) return;
+    el.value=valor || '';
   }
 
-  // ─── Cancelar edição ────────────────────────────────────────
-  function cancelarEdicao() {
-    linhaEmEdicao = null;
-    idEmEdicao    = null;
-    document.getElementById('infoEdicao').style.display   = 'none';
+  function cancelarEdicao(){
+    linhaEmEdicao=null;
+    idEmEdicao=null;
+    document.getElementById('infoEdicao').style.display='none';
     document.getElementById('formCadastro').reset();
-    document.getElementById('camposContatoOp').style.display = 'none';
-    document.getElementById('dataPrimeiroContato').value =
+    document.getElementById('camposContatoOp').style.display='none';
+    document.getElementById('dataPrimeiroContato').value=
       new Date().toISOString().split('T')[0];
-    document.getElementById('btnSubmit').innerHTML = '💾 Salvar Estabelecimento';
+    document.getElementById('btnSubmit').innerHTML='💾 Salvar Estabelecimento';
   }
 
-  // ─── Carregar lista ─────────────────────────────────────────
-  function carregarLista() {
-    var tbody = document.querySelector('#tabelaEstabelecimentos tbody');
-    tbody.innerHTML = '<tr><td colspan="5">Carregando...</td></tr>';
-    fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: 'listarEstabelecimentos' }) })
-      .then(function(r) { return r.json(); })
-      .then(function(resp) {
-        if (!resp.sucesso) {
-          tbody.innerHTML = '<tr><td colspan="5">Erro: ' + resp.mensagem + '</td></tr>';
+  function carregarLista(){
+    var tbody=document.querySelector('#tabelaEstabelecimentos tbody');
+    tbody.innerHTML='<tr><td colspan="5">Carregando...</td></tr>';
+    fetch(API_URL,{method:'POST',body:JSON.stringify({acao:'listarEstabelecimentos'})})
+      .then(function(r){return r.json();})
+      .then(function(resp){
+        if(!resp.sucesso){
+          tbody.innerHTML='<tr><td colspan="5">Erro: '+resp.mensagem+'</td></tr>';
           return;
         }
-        listaGlobal = resp.estabelecimentos || [];
+        listaGlobal=resp.estabelecimentos||[];
         renderTabela(listaGlobal);
       })
-      .catch(function(err) {
-        tbody.innerHTML = '<tr><td colspan="5">Erro de conexão: ' + err.message + '</td></tr>';
+      .catch(function(err){
+        tbody.innerHTML='<tr><td colspan="5">Erro: '+err.message+'</td></tr>';
       });
   }
 
-  function renderTabela(lista) {
-    var tbody = document.querySelector('#tabelaEstabelecimentos tbody');
-    tbody.innerHTML = '';
-    if (lista.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5">Nenhum registro encontrado.</td></tr>';
+  function renderTabela(lista){
+    var tbody=document.querySelector('#tabelaEstabelecimentos tbody');
+    tbody.innerHTML='';
+    if(lista.length===0){
+      tbody.innerHTML='<tr><td colspan="5">Nenhum registro.</td></tr>';
       return;
     }
-    lista.forEach(function(est) {
-      var tr = document.createElement('tr');
+    lista.forEach(function(est){
+      var tr=document.createElement('tr');
       tr.innerHTML =
-        '<td>' + est.id + '</td>' +
-        '<td>' + est.nome + '</td>' +
-        '<td><span class="badge badge-cidade">' + (est.cidade||'-') + ' / ' + (est.estado||'-') + '</span></td>' +
-        '<td>' + (est.segmento||'-') + '</td>' +
-        '<td><span class="badge badge-status">' + (est.status||'-') + '</span></td>';
-      tr.addEventListener('click', function() {
+        '<td>'+est.id+'</td>'+
+        '<td>'+est.nome+'</td>'+
+        '<td><span class="badge badge-cidade">'+(est.cidade||'-')+' / '+(est.estado||'-')+'</span></td>'+
+        '<td>'+(est.segmento||'-')+'</td>'+
+        '<td><span class="badge badge-status">'+(est.status||'-')+'</span></td>';
+      tr.addEventListener('click',function(){
         editarEstabelecimento(est.linha, est.id, est.nome);
       });
       tbody.appendChild(tr);
     });
   }
 
-  document.getElementById('filtroNome').addEventListener('input', aplicarFiltros);
-  document.getElementById('filtroCidade').addEventListener('input', aplicarFiltros);
+  document.getElementById('filtroNome').addEventListener('input',aplicarFiltros);
+  document.getElementById('filtroCidade').addEventListener('input',aplicarFiltros);
 
-  function aplicarFiltros() {
-    var nome   = document.getElementById('filtroNome').value.toLowerCase();
-    var cidade = document.getElementById('filtroCidade').value.toLowerCase();
-    var filtrada = listaGlobal.filter(function(e) {
-      var okNome   = !nome   || (e.nome  ||'').toLowerCase().indexOf(nome)   !== -1;
-      var okCidade = !cidade || (e.cidade||'').toLowerCase().indexOf(cidade) !== -1;
-      return okNome && okCidade;
+  function aplicarFiltros(){
+    var nome=document.getElementById('filtroNome').value.toLowerCase();
+    var cidade=document.getElementById('filtroCidade').value.toLowerCase();
+    var filtrada=listaGlobal.filter(function(e){
+      var okNome=!nome||(e.nome||'').toLowerCase().indexOf(nome)!==-1;
+      var okCid=!cidade||(e.cidade||'').toLowerCase().indexOf(cidade)!==-1;
+      return okNome && okCid;
     });
     renderTabela(filtrada);
   }
 
-  // ─── Editar ─────────────────────────────────────────────────
-  function editarEstabelecimento(linha, id, nome) {
-    fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: 'buscarEstabelecimento', linha: linha }) })
-      .then(function(r) { return r.json(); })
-      .then(function(d) {
-        if (!d.sucesso) { alert('Erro: ' + d.mensagem); return; }
+  function editarEstabelecimento(linha,id,nome){
+    fetch(API_URL,{method:'POST',body:JSON.stringify({acao:'buscarEstabelecimento',linha:linha})})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(!d.sucesso){alert('Erro: '+d.mensagem);return;}
+        linhaEmEdicao=linha;
+        idEmEdicao=id;
 
-        linhaEmEdicao = linha;
-        idEmEdicao    = id;
+        document.getElementById('infoEdicao').style.display='block';
+        document.getElementById('infoEdicaoNome').textContent=nome;
+        document.getElementById('infoEdicaoId').textContent=id;
+        document.getElementById('btnSubmit').innerHTML='💾 Salvar Alterações';
 
-        document.getElementById('infoEdicao').style.display = 'block';
-        document.getElementById('infoEdicaoNome').textContent = nome;
-        document.getElementById('infoEdicaoId').textContent   = id;
-        document.getElementById('btnSubmit').innerHTML = '💾 Salvar Alterações';
+        document.getElementById('nomeFantasia').value    =d['Nome Fantasia']          ||'';
+        document.getElementById('razaoSocial').value     =d['Razão Social']           ||'';
+        document.getElementById('cnpj').value            =d['CNPJ']                   ||'';
+        setSelect('segmento',d['Segmento']);
+        document.getElementById('cep').value             =d['CEP']                    ||'';
+        document.getElementById('logradouro').value      =d['Logradouro']             ||'';
+        document.getElementById('numero').value          =d['Número']                 ||'';
+        document.getElementById('complemento').value     =d['Complemento']            ||'';
+        document.getElementById('bairro').value          =d['Bairro']                 ||'';
+        document.getElementById('cidade').value          =d['Cidade']                 ||'';
+        document.getElementById('estado').value          =d['Estado']                 ||'';
+        document.getElementById('pontoReferencia').value =d['Ponto de Referência']    ||'';
 
-        document.getElementById('nomeFantasia').value          = d['Nome Fantasia']            || '';
-        document.getElementById('razaoSocial').value           = d['Razão Social']             || '';
-        document.getElementById('cnpj').value                  = d['CNPJ']                     || '';
-        setSelect('segmento', d['Segmento']);
-        document.getElementById('cep').value                   = d['CEP']                      || '';
-        document.getElementById('logradouro').value            = d['Logradouro']               || '';
-        document.getElementById('numero').value                = d['Número']                   || '';
-        document.getElementById('complemento').value           = d['Complemento']              || '';
-        document.getElementById('bairro').value                = d['Bairro']                   || '';
-        document.getElementById('cidade').value                = d['Cidade']                   || '';
-        document.getElementById('estado').value                = d['Estado']                   || '';
-        document.getElementById('pontoReferencia').value       = d['Ponto Referência']         || '';
-        document.getElementById('nomeResponsavel').value       = d['Nome Responsável']         || '';
-        document.getElementById('cargoResponsavel').value      = d['Cargo Responsável']        || '';
-        document.getElementById('whatsappResponsavel').value   = d['WhatsApp']                 || '';
-        document.getElementById('emailResponsavel').value      = d['Email']                    || '';
+        document.getElementById('nomeResponsavel').value    =d['Nome Responsável']       ||'';
+        document.getElementById('cargoResponsavel').value   =d['Cargo Responsável']      ||'';
+        document.getElementById('whatsappResponsavel').value=d['WhatsApp Responsável']   ||'';
+        document.getElementById('emailResponsavel').value   =d['Email Responsável']      ||'';
 
-        var contatoOp = d['Contato Op Mesmo'] || '';
-        setSelect('contatoOpMesmo', contatoOp);
-        document.getElementById('camposContatoOp').style.display =
-          contatoOp === 'Não' ? 'block' : 'none';
+        var contatoOp=d['Contato Operacional Mesmo?']||'';
+        setSelect('contatoOpMesmo',contatoOp);
+        document.getElementById('camposContatoOp').style.display=
+          contatoOp==='Não'?'block':'none';
 
-        document.getElementById('nomeContatoOp').value         = d['Nome Contato Op']          || '';
-        document.getElementById('cargoContatoOp').value        = d['Cargo Contato Op']         || '';
-        document.getElementById('whatsappContatoOp').value     = d['WhatsApp Op']              || '';
-        document.getElementById('emailContatoOp').value        = d['Email Op']                 || '';
+        document.getElementById('nomeContatoOp').value     =d['Nome Contato Op.']       ||'';
+        document.getElementById('cargoContatoOp').value    =d['Cargo Contato Op.']      ||'';
+        document.getElementById('whatsappContatoOp').value =d['WhatsApp Contato Op.']   ||'';
+        document.getElementById('emailContatoOp').value    =d['Email Contato Op.']      ||'';
 
-        setCheckboxValues('dias', d['Dias Funcionamento'] || '');
+        setCheckboxValues('dias',d['Dias Funcionamento']||'');
 
-        document.getElementById('horarioAbertura').value       = d['Abertura']                 || '';
-        document.getElementById('horarioFechamento').value     = d['Fechamento']               || '';
+        document.getElementById('horarioAbertura').value   =d['Horário Abertura']       ||'';
+        document.getElementById('horarioFechamento').value =d['Horário Fechamento']     ||'';
 
-        setSelect('feriados',        d['Feriados']);
-        setSelect('perfilPublico',   d['Perfil Público']);
-        setSelect('fluxoDiario',     d['Fluxo Diário']);
+        setSelect('feriados',       d['Feriados']);
+        setSelect('perfilPublico',  d['Perfil Público']);
+        setSelect('fluxoDiario',    d['Fluxo Diário']);
         setSelect('tempoPermanencia',d['Tempo Permanência']);
-        setSelect('internet',        d['Internet']);
-        setSelect('tipoConexao',     d['Tipo Conexão']);
-        setSelect('energiaProxima',  d['Energia Próxima']);
+        setSelect('internet',       d['Internet']);
+        setSelect('tipoConexao',    d['Tipo Conexão']);
+        setSelect('energiaProxima', d['Energia Próxima']);
 
-        document.getElementById('obsInfraestrutura').value     = d['Obs Infraestrutura']       || '';
-
-        setSelect('comoChegou', d['Como Chegou']);
-
-        document.getElementById('responsavelProspeccao').value = d['Responsável Prospecção']   || '';
-        document.getElementById('dataPrimeiroContato').value   = d['Data Primeiro Contato']    || '';
-
-        setSelect('status', d['Status']);
-
-        document.getElementById('observacoesGerais').value     = d['Observações']              || '';
+        document.getElementById('obsInfraestrutura').value =d['Obs Infraestrutura']     ||'';
+        setSelect('comoChegou',d['Como Chegou']);
+        document.getElementById('responsavelProspeccao').value=d['Responsável Prospecção']||'';
+        document.getElementById('dataPrimeiroContato').value  =d['Data Primeiro Contato']||'';
+        setSelect('status',d['Status']);
+        document.getElementById('observacoesGerais').value=d['Observações Gerais']||'';
 
         trocarTab('tab-novo');
-        window.scrollTo(0, 0);
+        window.scrollTo(0,0);
       })
-      .catch(function(err) { alert('Erro: ' + err.message); });
+      .catch(function(err){alert('Erro: '+err.message);});
   }
 
-  // ─── Submit ─────────────────────────────────────────────────
-  document.getElementById('formCadastro').addEventListener('submit', function(e) {
+  document.getElementById('formCadastro').addEventListener('submit',function(e){
     e.preventDefault();
-    var btn    = document.getElementById('btnSubmit');
-    var alerta = document.getElementById('alerta');
-    alerta.style.display = 'none';
-    btn.disabled = true;
-    btn.innerHTML = '<span class="loading"></span> Salvando...';
+    var btn=document.getElementById('btnSubmit');
+    var alerta=document.getElementById('alerta');
+    alerta.style.display='none';
+    btn.disabled=true;
+    btn.innerHTML='<span class="loading"></span> Salvando...';
 
-    var dados = {
-      acao:                  linhaEmEdicao ? 'atualizarEstabelecimento' : 'salvarEstabelecimento',
-      linha:                 linhaEmEdicao,
-      nomeFantasia:          document.getElementById('nomeFantasia').value,
-      razaoSocial:           document.getElementById('razaoSocial').value,
-      cnpj:                  document.getElementById('cnpj').value,
-      segmento:              document.getElementById('segmento').value,
-      cep:                   document.getElementById('cep').value,
-      logradouro:            document.getElementById('logradouro').value,
-      numero:                document.getElementById('numero').value,
-      complemento:           document.getElementById('complemento').value,
-      bairro:                document.getElementById('bairro').value,
-      cidade:                document.getElementById('cidade').value,
-      estado:                document.getElementById('estado').value,
-      pontoReferencia:       document.getElementById('pontoReferencia').value,
-      nomeResponsavel:       document.getElementById('nomeResponsavel').value,
-      cargoResponsavel:      document.getElementById('cargoResponsavel').value,
-      whatsappResponsavel:   document.getElementById('whatsappResponsavel').value,
-      emailResponsavel:      document.getElementById('emailResponsavel').value,
-      contatoOpMesmo:        document.getElementById('contatoOpMesmo').value,
-      nomeContatoOp:         document.getElementById('nomeContatoOp').value,
-      cargoContatoOp:        document.getElementById('cargoContatoOp').value,
-      whatsappContatoOp:     document.getElementById('whatsappContatoOp').value,
-      emailContatoOp:        document.getElementById('emailContatoOp').value,
-      diasFuncionamento:     getCheckboxValues('dias'),
-      horarioAbertura:       document.getElementById('horarioAbertura').value,
-      horarioFechamento:     document.getElementById('horarioFechamento').value,
-      feriados:              document.getElementById('feriados').value,
-      perfilPublico:         document.getElementById('perfilPublico').value,
-      fluxoDiario:           document.getElementById('fluxoDiario').value,
-      tempoPermanencia:      document.getElementById('tempoPermanencia').value,
-      internet:              document.getElementById('internet').value,
-      tipoConexao:           document.getElementById('tipoConexao').value,
-      energiaProxima:        document.getElementById('energiaProxima').value,
-      obsInfraestrutura:     document.getElementById('obsInfraestrutura').value,
-      comoChegou:            document.getElementById('comoChegou').value,
-      responsavelProspeccao: document.getElementById('responsavelProspeccao').value,
-      dataPrimeiroContato:   document.getElementById('dataPrimeiroContato').value,
-      status:                document.getElementById('status').value,
-      observacoesGerais:     document.getElementById('observacoesGerais').value
+    var dados={
+      acao:                 linhaEmEdicao?'atualizarEstabelecimento':'salvarEstabelecimento',
+      linha:                linhaEmEdicao,
+      nomeFantasia:         document.getElementById('nomeFantasia').value,
+      razaoSocial:          document.getElementById('razaoSocial').value,
+      cnpj:                 document.getElementById('cnpj').value,
+      segmento:             document.getElementById('segmento').value,
+      cep:                  document.getElementById('cep').value,
+      logradouro:           document.getElementById('logradouro').value,
+      numero:               document.getElementById('numero').value,
+      complemento:          document.getElementById('complemento').value,
+      bairro:               document.getElementById('bairro').value,
+      cidade:               document.getElementById('cidade').value,
+      estado:               document.getElementById('estado').value,
+      pontoReferencia:      document.getElementById('pontoReferencia').value,
+      nomeResponsavel:      document.getElementById('nomeResponsavel').value,
+      cargoResponsavel:     document.getElementById('cargoResponsavel').value,
+      whatsappResponsavel:  document.getElementById('whatsappResponsavel').value,
+      emailResponsavel:     document.getElementById('emailResponsavel').value,
+      contatoOpMesmo:       document.getElementById('contatoOpMesmo').value,
+      nomeContatoOp:        document.getElementById('nomeContatoOp').value,
+      cargoContatoOp:       document.getElementById('cargoContatoOp').value,
+      whatsappContatoOp:    document.getElementById('whatsappContatoOp').value,
+      emailContatoOp:       document.getElementById('emailContatoOp').value,
+      diasFuncionamento:    getCheckboxValues('dias'),
+      horarioAbertura:      document.getElementById('horarioAbertura').value,
+      horarioFechamento:    document.getElementById('horarioFechamento').value,
+      feriados:             document.getElementById('feriados').value,
+      perfilPublico:        document.getElementById('perfilPublico').value,
+      fluxoDiario:          document.getElementById('fluxoDiario').value,
+      tempoPermanencia:     document.getElementById('tempoPermanencia').value,
+      internet:             document.getElementById('internet').value,
+      tipoConexao:          document.getElementById('tipoConexao').value,
+      energiaProxima:       document.getElementById('energiaProxima').value,
+      obsInfraestrutura:    document.getElementById('obsInfraestrutura').value,
+      comoChegou:           document.getElementById('comoChegou').value,
+      responsavelProspeccao:document.getElementById('responsavelProspeccao').value,
+      dataPrimeiroContato:  document.getElementById('dataPrimeiroContato').value,
+      status:               document.getElementById('status').value,
+      observacoesGerais:    document.getElementById('observacoesGerais').value
     };
 
-    fetch(API_URL, { method: 'POST', body: JSON.stringify(dados) })
-      .then(function(r) { return r.json(); })
-      .then(function(resultado) {
-        if (resultado.sucesso) {
-          alerta.className = 'alerta sucesso';
-          alerta.innerHTML = '✅ ' + resultado.mensagem + (resultado.id ? ' | ID: ' + resultado.id : '');
+    fetch(API_URL,{method:'POST',body:JSON.stringify(dados)})
+      .then(function(r){return r.json();})
+      .then(function(resultado){
+        if(resultado.sucesso){
+          alerta.className='alerta sucesso';
+          alerta.innerHTML='✅ '+resultado.mensagem+(resultado.id?' | ID: '+resultado.id:'');
           cancelarEdicao();
           carregarLista();
-        } else {
-          alerta.className = 'alerta erro';
-          alerta.innerHTML = '❌ ' + resultado.mensagem;
+        }else{
+          alerta.className='alerta erro';
+          alerta.innerHTML='❌ '+resultado.mensagem;
         }
-        alerta.style.display = 'block';
-        window.scrollTo(0, 0);
-        btn.disabled = false;
-        btn.innerHTML = linhaEmEdicao ? '💾 Salvar Alterações' : '💾 Salvar Estabelecimento';
+        alerta.style.display='block';
+        window.scrollTo(0,0);
+        btn.disabled=false;
+        btn.innerHTML='💾 Salvar Estabelecimento';
       })
-      .catch(function(err) {
-        alerta.className = 'alerta erro';
-        alerta.innerHTML = '❌ Erro de conexão: ' + err.message;
-        alerta.style.display = 'block';
-        btn.disabled = false;
-        btn.innerHTML = '💾 Salvar Estabelecimento';
+      .catch(function(err){
+        alerta.className='alerta erro';
+        alerta.innerHTML='❌ Erro de conexão: '+err.message;
+        alerta.style.display='block';
+        btn.disabled=false;
+        btn.innerHTML='💾 Salvar Estabelecimento';
       });
   });
 
