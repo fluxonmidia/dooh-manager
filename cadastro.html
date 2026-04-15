@@ -5,6 +5,83 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cadastro de Estabelecimento</title>
   <link rel="stylesheet" href="estilo.css">
+  <style>
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #ddd;
+    }
+    .tab-btn {
+      padding: 8px 16px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+    }
+    .tab-btn.ativo {
+      border-bottom-color: #1a73e8;
+      color: #1a73e8;
+    }
+    .tab-conteudo {
+      display: none;
+    }
+    .tab-conteudo.ativo {
+      display: block;
+    }
+    table.listagem {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+    table.listagem th, table.listagem td {
+      border: 1px solid #eee;
+      padding: 6px 8px;
+      text-align: left;
+    }
+    table.listagem th {
+      background: #f5f5f5;
+    }
+    table.listagem tr:hover {
+      background: #f0f7ff;
+      cursor: pointer;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      background: #eee;
+    }
+    .badge-status {
+      background: #e3f2fd;
+      color: #1a73e8;
+    }
+    .badge-cidade {
+      background: #f1f8e9;
+      color: #558b2f;
+    }
+    .info-edicao {
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 8px;
+    }
+    .info-edicao span {
+      font-weight: 600;
+    }
+    .btn-secundario {
+      background: #fff;
+      color: #1a73e8;
+      border: 1px solid #1a73e8;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      margin-left: 8px;
+    }
+  </style>
 </head>
 <body>
 
@@ -17,176 +94,144 @@
 </div>
 
 <div class="container">
+  <div class="tabs">
+    <button class="tab-btn ativo" data-tab="tab-novo">Novo Cadastro</button>
+    <button class="tab-btn" data-tab="tab-consulta">Consultar / Editar</button>
+  </div>
+
   <div id="alerta" class="alerta"></div>
-  <form id="formCadastro">
 
-    <div class="card">
-      <h2>📋 Dados do Estabelecimento</h2>
-      <div class="form-group">
-        <label>Nome Fantasia <span class="obrigatorio">*</span></label>
-        <input type="text" id="nomeFantasia" required>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Razão Social <span class="opcional">(opcional)</span></label>
-          <input type="text" id="razaoSocial">
-        </div>
-        <div class="form-group">
-          <label>CNPJ <span class="opcional">(opcional)</span></label>
-          <input type="text" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18"
-            oninput="
-              var v = this.value.replace(/\D/g,'').substring(0,14);
-              if(v.length>12) v=v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,'$1.$2.$3/$4-$5');
-              else if(v.length>8) v=v.replace(/^(\d{2})(\d{3})(\d{3})(\d+)$/,'$1.$2.$3/$4');
-              else if(v.length>5) v=v.replace(/^(\d{2})(\d{3})(\d+)$/,'$1.$2.$3');
-              else if(v.length>2) v=v.replace(/^(\d{2})(\d+)$/,'$1.$2');
-              this.value=v;
-            ">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Segmento <span class="obrigatorio">*</span></label>
-        <select id="segmento" required>
-          <option value="">Selecione...</option>
-          <option>Restaurante</option>
-          <option>Lanchonete / Fast Food</option>
-          <option>Padaria / Confeitaria</option>
-          <option>Bar / Pub</option>
-          <option>Salão de Beleza / Barbearia</option>
-          <option>Academia / Fitness</option>
-          <option>Clínica / Consultório</option>
-          <option>Farmácia</option>
-          <option>Supermercado / Mercado</option>
-          <option>Loja de Roupas / Calçados</option>
-          <option>Pet Shop</option>
-          <option>Escola / Curso</option>
-          <option>Hotel / Pousada</option>
-          <option>Outro</option>
-        </select>
-      </div>
+  <!-- Aba Novo Cadastro -->
+  <div id="tab-novo" class="tab-conteudo ativo">
+    <div id="infoEdicao" class="info-edicao" style="display:none;">
+      Editando estabelecimento <span id="infoEdicaoNome"></span> (ID: <span id="infoEdicaoId"></span>).
+      <button type="button" class="btn-secundario" onclick="cancelarEdicao()">Cancelar edição</button>
     </div>
 
-    <div class="card">
-      <h2>📍 Endereço</h2>
-      <div class="form-row">
-        <div class="form-group">
-          <label>CEP <span class="obrigatorio">*</span></label>
-          <input type="text" id="cep" required placeholder="00000-000" maxlength="9"
-            oninput="
-              var v = this.value.replace(/\D/g,'').substring(0,8);
-              if(v.length>5) v=v.replace(/^(\d{5})(\d+)$/,'$1-$2');
-              this.value=v;
-              if(v.replace(/\D/g,'').length===8){
-                fetch('https://viacep.com.br/ws/'+v.replace(/\D/g,'')+'/json/')
-                .then(function(r){return r.json();})
-                .then(function(d){
-                  if(!d.erro){
-                    document.getElementById('logradouro').value=d.logradouro||'';
-                    document.getElementById('bairro').value=d.bairro||'';
-                    document.getElementById('cidade').value=d.localidade||'';
-                    document.getElementById('estado').value=d.uf||'';
-                    document.getElementById('numero').focus();
-                  }
-                });
-              }
-            ">
-        </div>
-        <div class="form-group">
-          <label>Número <span class="obrigatorio">*</span></label>
-          <input type="text" id="numero" required>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Logradouro <span class="obrigatorio">*</span></label>
-        <input type="text" id="logradouro" required>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Complemento <span class="opcional">(opcional)</span></label>
-          <input type="text" id="complemento">
-        </div>
-        <div class="form-group">
-          <label>Bairro <span class="obrigatorio">*</span></label>
-          <input type="text" id="bairro" required>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Cidade <span class="obrigatorio">*</span></label>
-          <input type="text" id="cidade" required>
-        </div>
-        <div class="form-group">
-          <label>Estado <span class="obrigatorio">*</span></label>
-          <input type="text" id="estado" required maxlength="2" placeholder="SP">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Ponto de Referência <span class="opcional">(opcional)</span></label>
-        <input type="text" id="pontoReferencia">
-      </div>
-    </div>
+    <form id="formCadastro">
 
-    <div class="card">
-      <h2>👤 Responsável</h2>
-      <div class="form-row">
+      <div class="card">
+        <h2>📋 Dados do Estabelecimento</h2>
         <div class="form-group">
-          <label>Nome <span class="obrigatorio">*</span></label>
-          <input type="text" id="nomeResponsavel" required>
+          <label>Nome Fantasia <span class="obrigatorio">*</span></label>
+          <input type="text" id="nomeFantasia" required>
         </div>
-        <div class="form-group">
-          <label>Cargo <span class="obrigatorio">*</span></label>
-          <input type="text" id="cargoResponsavel" required>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>WhatsApp <span class="obrigatorio">*</span></label>
-          <input type="text" id="whatsappResponsavel" required placeholder="(00) 00000-0000" maxlength="15"
-            oninput="
-              var v = this.value.replace(/\D/g,'').substring(0,11);
-              if(v.length===0){this.value='';return;}
-              if(v.length<=2) v='('+v;
-              else if(v.length<=6) v='('+v.substring(0,2)+') '+v.substring(2);
-              else if(v.length<=10) v='('+v.substring(0,2)+') '+v.substring(2,6)+'-'+v.substring(6);
-              else v='('+v.substring(0,2)+') '+v.substring(2,7)+'-'+v.substring(7);
-              this.value=v;
-            ">
-        </div>
-        <div class="form-group">
-          <label>E-mail <span class="opcional">(opcional)</span></label>
-          <input type="email" id="emailResponsavel">
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>👤 Contato Operacional</h2>
-      <div class="form-group">
-        <label>O contato operacional é o mesmo responsável?</label>
-        <select id="contatoOpMesmo" onchange="
-          document.getElementById('camposContatoOp').style.display =
-            this.value === 'Não' ? 'block' : 'none';
-        ">
-          <option value="">Selecione...</option>
-          <option value="Sim">Sim</option>
-          <option value="Não">Não, informar outro contato</option>
-        </select>
-      </div>
-      <div id="camposContatoOp" style="display:none;">
         <div class="form-row">
           <div class="form-group">
-            <label>Nome do Contato Operacional</label>
-            <input type="text" id="nomeContatoOp">
+            <label>Razão Social <span class="opcional">(opcional)</span></label>
+            <input type="text" id="razaoSocial">
           </div>
           <div class="form-group">
-            <label>Cargo</label>
-            <input type="text" id="cargoContatoOp">
+            <label>CNPJ <span class="opcional">(opcional)</span></label>
+            <input type="text" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18"
+              oninput="
+                var v = this.value.replace(/\D/g,'').substring(0,14);
+                if(v.length>12) v=v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,'$1.$2.$3/$4-$5');
+                else if(v.length>8) v=v.replace(/^(\d{2})(\d{3})(\d{3})(\d+)$/,'$1.$2.$3/$4');
+                else if(v.length>5) v=v.replace(/^(\d{2})(\d{3})(\d+)$/,'$1.$2.$3');
+                else if(v.length>2) v=v.replace(/^(\d{2})(\d+)$/,'$1.$2');
+                this.value=v;
+              ">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Segmento <span class="obrigatorio">*</span></label>
+          <select id="segmento" required>
+            <option value="">Selecione...</option>
+            <option>Restaurante</option>
+            <option>Lanchonete / Fast Food</option>
+            <option>Padaria / Confeitaria</option>
+            <option>Bar / Pub</option>
+            <option>Salão de Beleza / Barbearia</option>
+            <option>Academia / Fitness</option>
+            <option>Clínica / Consultório</option>
+            <option>Farmácia</option>
+            <option>Supermercado / Mercado</option>
+            <option>Loja de Roupas / Calçados</option>
+            <option>Pet Shop</option>
+            <option>Escola / Curso</option>
+            <option>Hotel / Pousada</option>
+            <option>Outro</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📍 Endereço</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label>CEP <span class="obrigatorio">*</span></label>
+            <input type="text" id="cep" required placeholder="00000-000" maxlength="9"
+              oninput="
+                var v = this.value.replace(/\D/g,'').substring(0,8);
+                if(v.length>5) v=v.replace(/^(\d{5})(\d+)$/,'$1-$2');
+                this.value=v;
+                if(v.replace(/\D/g,'').length===8){
+                  fetch('https://viacep.com.br/ws/'+v.replace(/\D/g,'')+'/json/')
+                  .then(function(r){return r.json();})
+                  .then(function(d){
+                    if(!d.erro){
+                      document.getElementById('logradouro').value=d.logradouro||'';
+                      document.getElementById('bairro').value=d.bairro||'';
+                      document.getElementById('cidade').value=d.localidade||'';
+                      document.getElementById('estado').value=d.uf||'';
+                      document.getElementById('numero').focus();
+                    }
+                  });
+                }
+              ">
+          </div>
+          <div class="form-group">
+            <label>Número <span class="obrigatorio">*</span></label>
+            <input type="text" id="numero" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Logradouro <span class="obrigatorio">*</span></label>
+          <input type="text" id="logradouro" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Complemento <span class="opcional">(opcional)</span></label>
+            <input type="text" id="complemento">
+          </div>
+          <div class="form-group">
+            <label>Bairro <span class="obrigatorio">*</span></label>
+            <input type="text" id="bairro" required>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>WhatsApp</label>
-            <input type="text" id="whatsappContatoOp" placeholder="(00) 00000-0000" maxlength="15"
+            <label>Cidade <span class="obrigatorio">*</span></label>
+            <input type="text" id="cidade" required>
+          </div>
+          <div class="form-group">
+            <label>Estado <span class="obrigatorio">*</span></label>
+            <input type="text" id="estado" required maxlength="2" placeholder="SP">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Ponto de Referência <span class="opcional">(opcional)</span></label>
+          <input type="text" id="pontoReferencia">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>👤 Responsável</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nome <span class="obrigatorio">*</span></label>
+            <input type="text" id="nomeResponsavel" required>
+          </div>
+          <div class="form-group">
+            <label>Cargo <span class="obrigatorio">*</span></label>
+            <input type="text" id="cargoResponsavel" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>WhatsApp <span class="obrigatorio">*</span></label>
+            <input type="text" id="whatsappResponsavel" required placeholder="(00) 00000-0000" maxlength="15"
               oninput="
                 var v = this.value.replace(/\D/g,'').substring(0,11);
                 if(v.length===0){this.value='';return;}
@@ -199,170 +244,253 @@
           </div>
           <div class="form-group">
             <label>E-mail <span class="opcional">(opcional)</span></label>
-            <input type="email" id="emailContatoOp">
+            <input type="email" id="emailResponsavel">
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="card">
-      <h2>⏰ Funcionamento</h2>
-      <div class="form-group">
-        <label>Dias de Funcionamento <span class="obrigatorio">*</span></label>
-        <div class="checkbox-group">
-          <label class="checkbox-item"><input type="checkbox" name="dias" value="Segunda"> Segunda-feira</label>
-          <label class="checkbox-item"><input type="checkbox" name="dias" value="Terça"> Terça-feira</label>
-          <label class="checkbox-item"><input type="checkbox" name="dias" value="Quarta"> Quarta-feira</label>
-          <label class="checkbox-item"><input type="checkbox" name="dias" value="Quinta"> Quinta-feira</label>
-          <label class="checkbox-item"><input type="checkbox" name="dias" value="Sexta"> Sexta-feira</label>
-          <label class="checkbox-item"><input type="checkbox" name="dias" value="Sábado"> Sábado</label>
-          <label class="checkbox-item"><input type="checkbox" name="dias" value="Domingo"> Domingo</label>
-        </div>
-      </div>
-      <div class="form-row">
+      <div class="card">
+        <h2>👤 Contato Operacional</h2>
         <div class="form-group">
-          <label>Horário de Abertura <span class="obrigatorio">*</span></label>
-          <input type="time" id="horarioAbertura" required>
-        </div>
-        <div class="form-group">
-          <label>Horário de Fechamento <span class="obrigatorio">*</span></label>
-          <input type="time" id="horarioFechamento" required>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Funciona em feriados?</label>
-        <select id="feriados">
-          <option value="">Selecione...</option>
-          <option>Sim, normalmente</option>
-          <option>Sim, em horário reduzido</option>
-          <option>Não</option>
-          <option>Depende do feriado</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>📊 Perfil do Público</h2>
-      <div class="form-group">
-        <label>Perfil do Público <span class="obrigatorio">*</span></label>
-        <select id="perfilPublico" required>
-          <option value="">Selecione...</option>
-          <option>Classe A/B</option>
-          <option>Classe B/C</option>
-          <option>Classe C/D</option>
-          <option>Misto</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Fluxo Diário Estimado</label>
-          <select id="fluxoDiario">
+          <label>O contato operacional é o mesmo responsável?</label>
+          <select id="contatoOpMesmo" onchange="
+            document.getElementById('camposContatoOp').style.display =
+              this.value === 'Não' ? 'block' : 'none';
+          ">
             <option value="">Selecione...</option>
-            <option>Até 50 pessoas</option>
-            <option>50 a 100 pessoas</option>
-            <option>100 a 300 pessoas</option>
-            <option>300 a 500 pessoas</option>
-            <option>Mais de 500 pessoas</option>
+            <option value="Sim">Sim</option>
+            <option value="Não">Não, informar outro contato</option>
+          </select>
+        </div>
+        <div id="camposContatoOp" style="display:none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nome do Contato Operacional</label>
+              <input type="text" id="nomeContatoOp">
+            </div>
+            <div class="form-group">
+              <label>Cargo</label>
+              <input type="text" id="cargoContatoOp">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>WhatsApp</label>
+              <input type="text" id="whatsappContatoOp" placeholder="(00) 00000-0000" maxlength="15"
+                oninput="
+                  var v = this.value.replace(/\D/g,'').substring(0,11);
+                  if(v.length===0){this.value='';return;}
+                  if(v.length<=2) v='('+v;
+                  else if(v.length<=6) v='('+v.substring(0,2)+') '+v.substring(2);
+                  else if(v.length<=10) v='('+v.substring(0,2)+') '+v.substring(2,6)+'-'+v.substring(6);
+                  else v='('+v.substring(0,2)+') '+v.substring(2,7)+'-'+v.substring(7);
+                  this.value=v;
+                ">
+            </div>
+            <div class="form-group">
+              <label>E-mail <span class="opcional">(opcional)</span></label>
+              <input type="email" id="emailContatoOp">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>⏰ Funcionamento</h2>
+        <div class="form-group">
+          <label>Dias de Funcionamento <span class="obrigatorio">*</span></label>
+          <div class="checkbox-group">
+            <label class="checkbox-item"><input type="checkbox" name="dias" value="Segunda"> Segunda-feira</label>
+            <label class="checkbox-item"><input type="checkbox" name="dias" value="Terça"> Terça-feira</label>
+            <label class="checkbox-item"><input type="checkbox" name="dias" value="Quarta"> Quarta-feira</label>
+            <label class="checkbox-item"><input type="checkbox" name="dias" value="Quinta"> Quinta-feira</label>
+            <label class="checkbox-item"><input type="checkbox" name="dias" value="Sexta"> Sexta-feira</label>
+            <label class="checkbox-item"><input type="checkbox" name="dias" value="Sábado"> Sábado</label>
+            <label class="checkbox-item"><input type="checkbox" name="dias" value="Domingo"> Domingo</label>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Horário de Abertura <span class="obrigatorio">*</span></label>
+            <input type="time" id="horarioAbertura" required>
+          </div>
+          <div class="form-group">
+            <label>Horário de Fechamento <span class="obrigatorio">*</span></label>
+            <input type="time" id="horarioFechamento" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Funciona em feriados?</label>
+          <select id="feriados">
+            <option value="">Selecione...</option>
+            <option>Sim, normalmente</option>
+            <option>Sim, em horário reduzido</option>
+            <option>Não</option>
+            <option>Depende do feriado</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📊 Perfil do Público</h2>
+        <div class="form-group">
+          <label>Perfil do Público <span class="obrigatorio">*</span></label>
+          <select id="perfilPublico" required>
+            <option value="">Selecione...</option>
+            <option>Classe A/B</option>
+            <option>Classe B/C</option>
+            <option>Classe C/D</option>
+            <option>Misto</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fluxo Diário Estimado</label>
+            <select id="fluxoDiario">
+              <option value="">Selecione...</option>
+              <option>Até 50 pessoas</option>
+              <option>50 a 100 pessoas</option>
+              <option>100 a 300 pessoas</option>
+              <option>300 a 500 pessoas</option>
+              <option>Mais de 500 pessoas</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tempo Médio de Permanência</label>
+            <select id="tempoPermanencia">
+              <option value="">Selecione...</option>
+              <option>Menos de 5 minutos</option>
+              <option>5 a 15 minutos</option>
+              <option>15 a 30 minutos</option>
+              <option>30 a 60 minutos</option>
+              <option>Mais de 1 hora</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🔌 Infraestrutura</h2>
+        <div class="form-group">
+          <label>Possui internet? <span class="obrigatorio">*</span></label>
+          <select id="internet" required>
+            <option value="">Selecione...</option>
+            <option>Sim</option>
+            <option>Não</option>
+            <option>Não sei</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Tempo Médio de Permanência</label>
-          <select id="tempoPermanencia">
+          <label>Tipo de Conexão</label>
+          <select id="tipoConexao">
             <option value="">Selecione...</option>
-            <option>Menos de 5 minutos</option>
-            <option>5 a 15 minutos</option>
-            <option>15 a 30 minutos</option>
-            <option>30 a 60 minutos</option>
-            <option>Mais de 1 hora</option>
+            <option>Wi-Fi</option>
+            <option>Cabo (Ethernet)</option>
+            <option>Ambos</option>
+            <option>4G/5G</option>
           </select>
         </div>
+        <div class="form-group">
+          <label>Energia elétrica próxima ao ponto desejado?</label>
+          <select id="energiaProxima">
+            <option value="">Selecione...</option>
+            <option>Sim</option>
+            <option>Não</option>
+            <option>Não sei</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Observações de Infraestrutura <span class="opcional">(opcional)</span></label>
+          <textarea id="obsInfraestrutura"></textarea>
+        </div>
       </div>
-    </div>
 
-    <div class="card">
-      <h2>🔌 Infraestrutura</h2>
-      <div class="form-group">
-        <label>Possui internet? <span class="obrigatorio">*</span></label>
-        <select id="internet" required>
-          <option value="">Selecione...</option>
-          <option>Sim</option>
-          <option>Não</option>
-          <option>Não sei</option>
-        </select>
+      <div class="card">
+        <h2>📣 Prospecção</h2>
+        <div class="form-group">
+          <label>Como chegou até nós? <span class="obrigatorio">*</span></label>
+          <select id="comoChegou" required>
+            <option value="">Selecione...</option>
+            <option>Indicação</option>
+            <option>Prospecção ativa</option>
+            <option>Redes sociais</option>
+            <option>Google</option>
+            <option>Evento</option>
+            <option>Outro</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Responsável pela Prospecção <span class="obrigatorio">*</span></label>
+            <input type="text" id="responsavelProspeccao" required>
+          </div>
+          <div class="form-group">
+            <label>Data do Primeiro Contato <span class="obrigatorio">*</span></label>
+            <input type="date" id="dataPrimeiroContato" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Status <span class="obrigatorio">*</span></label>
+          <select id="status" required>
+            <option value="">Selecione...</option>
+            <option>Lead</option>
+            <option>Em negociação</option>
+            <option>Contrato assinado</option>
+            <option>Instalado e ativo</option>
+            <option>Cancelado</option>
+            <option>Sem interesse</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Observações Gerais <span class="opcional">(opcional)</span></label>
+          <textarea id="observacoesGerais"></textarea>
+        </div>
       </div>
-      <div class="form-group">
-        <label>Tipo de Conexão</label>
-        <select id="tipoConexao">
-          <option value="">Selecione...</option>
-          <option>Wi-Fi</option>
-          <option>Cabo (Ethernet)</option>
-          <option>Ambos</option>
-          <option>4G/5G</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Energia elétrica próxima ao ponto desejado?</label>
-        <select id="energiaProxima">
-          <option value="">Selecione...</option>
-          <option>Sim</option>
-          <option>Não</option>
-          <option>Não sei</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Observações de Infraestrutura <span class="opcional">(opcional)</span></label>
-        <textarea id="obsInfraestrutura"></textarea>
-      </div>
-    </div>
 
+      <button type="submit" class="btn-submit" id="btnSubmit">💾 Salvar Estabelecimento</button>
+    </form>
+  </div>
+
+  <!-- Aba Consulta -->
+  <div id="tab-consulta" class="tab-conteudo">
     <div class="card">
-      <h2>📣 Prospecção</h2>
-      <div class="form-group">
-        <label>Como chegou até nós? <span class="obrigatorio">*</span></label>
-        <select id="comoChegou" required>
-          <option value="">Selecione...</option>
-          <option>Indicação</option>
-          <option>Prospecção ativa</option>
-          <option>Redes sociais</option>
-          <option>Google</option>
-          <option>Evento</option>
-          <option>Outro</option>
-        </select>
-      </div>
+      <h2>📚 Estabelecimentos Cadastrados</h2>
       <div class="form-row">
         <div class="form-group">
-          <label>Responsável pela Prospecção <span class="obrigatorio">*</span></label>
-          <input type="text" id="responsavelProspeccao" required>
+          <label>Filtrar por nome</label>
+          <input type="text" id="filtroNome" placeholder="Digite parte do nome">
         </div>
         <div class="form-group">
-          <label>Data do Primeiro Contato <span class="obrigatorio">*</span></label>
-          <input type="date" id="dataPrimeiroContato" required>
+          <label>Filtrar por cidade</label>
+          <input type="text" id="filtroCidade" placeholder="Digite parte da cidade">
         </div>
       </div>
-      <div class="form-group">
-        <label>Status <span class="obrigatorio">*</span></label>
-        <select id="status" required>
-          <option value="">Selecione...</option>
-          <option>Lead</option>
-          <option>Em negociação</option>
-          <option>Contrato assinado</option>
-          <option>Instalado e ativo</option>
-          <option>Cancelado</option>
-          <option>Sem interesse</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Observações Gerais <span class="opcional">(opcional)</span></label>
-        <textarea id="observacoesGerais"></textarea>
+      <div id="listaContainer">
+        <table class="listagem" id="tabelaEstabelecimentos">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome Fantasia</th>
+              <th>Cidade/UF</th>
+              <th>Segmento</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="5">Carregando...</td></tr>
+          </tbody>
+        </table>
+        <div class="hint">Clique em uma linha para carregar o cadastro na aba "Novo Cadastro" e editar.</div>
       </div>
     </div>
-
-    <button type="submit" class="btn-submit" id="btnSubmit">💾 Salvar Estabelecimento</button>
-  </form>
+  </div>
 </div>
 
 <script>
   var API_URL = 'https://script.google.com/macros/s/AKfycbwtA46Q55_pTTPzTh9aXjQh2syF27IYWk0ZRO50KNhCmEdfOQtKqZ8pKazn7l9mvFuAeg/exec';
+
+  var linhaEmEdicao = null;
+  var idEmEdicao    = null;
 
   document.getElementById('dataPrimeiroContato').value =
     new Date().toISOString().split('T')[0];
@@ -370,6 +498,163 @@
   function getCheckboxValues(name) {
     return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
       .map(function(cb) { return cb.value; }).join(', ');
+  }
+
+  function setCheckboxValues(name, csv) {
+    var valores = (csv || '').split(',').map(function(v){return v.trim();}).filter(Boolean);
+    document.querySelectorAll('input[name="' + name + '"]').forEach(function(cb){
+      cb.checked = valores.indexOf(cb.value) !== -1;
+    });
+  }
+
+  function trocarTab(idTab) {
+    document.querySelectorAll('.tab-btn').forEach(function(b){
+      b.classList.toggle('ativo', b.dataset.tab === idTab);
+    });
+    document.querySelectorAll('.tab-conteudo').forEach(function(div){
+      div.classList.toggle('ativo', div.id === idTab);
+    });
+  }
+
+  document.querySelectorAll('.tab-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      trocarTab(this.dataset.tab);
+    });
+  });
+
+  function cancelarEdicao() {
+    linhaEmEdicao = null;
+    idEmEdicao    = null;
+    document.getElementById('infoEdicao').style.display = 'none';
+    document.getElementById('formCadastro').reset();
+    document.getElementById('camposContatoOp').style.display = 'none';
+    document.getElementById('dataPrimeiroContato').value =
+      new Date().toISOString().split('T')[0];
+    document.getElementById('btnSubmit').textContent = '💾 Salvar Estabelecimento';
+  }
+
+  function carregarListaEstabelecimentos() {
+    var tbody = document.querySelector('#tabelaEstabelecimentos tbody');
+    tbody.innerHTML = '<tr><td colspan="5">Carregando...</td></tr>';
+
+    fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: 'listarEstabelecimentos' }) })
+      .then(function(r){ return r.json(); })
+      .then(function(resp){
+        if (!resp.sucesso) {
+          tbody.innerHTML = '<tr><td colspan="5">Erro ao carregar: ' + resp.mensagem + '</td></tr>';
+          return;
+        }
+        var lista = resp.estabelecimentos || [];
+        if (lista.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5">Nenhum estabelecimento cadastrado.</td></tr>';
+          return;
+        }
+        renderTabela(lista);
+      })
+      .catch(function(err){
+        tbody.innerHTML = '<tr><td colspan="5">Erro: ' + err.message + '</td></tr>';
+      });
+  }
+
+  var listaGlobalEst = [];
+
+  function renderTabela(lista) {
+    listaGlobalEst = lista;
+    var tbody = document.querySelector('#tabelaEstabelecimentos tbody');
+    tbody.innerHTML = '';
+    lista.forEach(function(est){
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>' + est.id + '</td>' +
+        '<td>' + est.nome + '</td>' +
+        '<td><span class="badge badge-cidade">' + (est.cidade || '-') + ' / ' + (est.estado || '-') + '</span></td>' +
+        '<td>' + (est.segmento || '-') + '</td>' +
+        '<td><span class="badge badge-status">' + (est.status || '-') + '</span></td>';
+      tr.addEventListener('click', function(){
+        editarEstabelecimento(est.linha, est.id, est.nome);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById('filtroNome').addEventListener('input', aplicarFiltros);
+  document.getElementById('filtroCidade').addEventListener('input', aplicarFiltros);
+
+  function aplicarFiltros() {
+    var nome   = document.getElementById('filtroNome').value.toLowerCase();
+    var cidade = document.getElementById('filtroCidade').value.toLowerCase();
+    var filtrada = listaGlobalEst.filter(function(e){
+      var okNome   = !nome   || (e.nome   || '').toLowerCase().indexOf(nome)   !== -1;
+      var okCidade = !cidade || (e.cidade || '').toLowerCase().indexOf(cidade) !== -1;
+      return okNome && okCidade;
+    });
+    renderTabela(filtrada);
+  }
+
+  function editarEstabelecimento(linha, id, nome) {
+    fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: 'buscarEstabelecimento', linha: linha }) })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (!d.sucesso) {
+          alert('Erro ao carregar estabelecimento: ' + d.mensagem);
+          return;
+        }
+        linhaEmEdicao = linha;
+        idEmEdicao    = id;
+
+        document.getElementById('infoEdicao').style.display = 'block';
+        document.getElementById('infoEdicaoNome').textContent = nome;
+        document.getElementById('infoEdicaoId').textContent   = id;
+        document.getElementById('btnSubmit').textContent = '💾 Salvar Alterações';
+
+        document.getElementById('nomeFantasia').value      = d['Nome Fantasia'] || '';
+        document.getElementById('razaoSocial').value       = d['Razão Social'] || '';
+        document.getElementById('cnpj').value              = d['CNPJ'] || '';
+        document.getElementById('segmento').value          = d['Segmento'] || '';
+        document.getElementById('cep').value               = d['CEP'] || '';
+        document.getElementById('logradouro').value        = d['Logradouro'] || '';
+        document.getElementById('numero').value            = d['Número'] || '';
+        document.getElementById('complemento').value       = d['Complemento'] || '';
+        document.getElementById('bairro').value            = d['Bairro'] || '';
+        document.getElementById('cidade').value            = d['Cidade'] || '';
+        document.getElementById('estado').value            = d['Estado'] || '';
+        document.getElementById('pontoReferencia').value   = d['Ponto Referência'] || '';
+        document.getElementById('nomeResponsavel').value   = d['Nome Responsável'] || '';
+        document.getElementById('cargoResponsavel').value  = d['Cargo Responsável'] || '';
+        document.getElementById('whatsappResponsavel').value = d['WhatsApp'] || '';
+        document.getElementById('emailResponsavel').value  = d['Email'] || '';
+        document.getElementById('contatoOpMesmo').value    = d['Contato Op Mesmo'] || '';
+
+        document.getElementById('camposContatoOp').style.display =
+          (d['Contato Op Mesmo'] === 'Não') ? 'block' : 'none';
+
+        document.getElementById('nomeContatoOp').value     = d['Nome Contato Op'] || '';
+        document.getElementById('cargoContatoOp').value    = d['Cargo Contato Op'] || '';
+        document.getElementById('whatsappContatoOp').value = d['WhatsApp Op'] || '';
+        document.getElementById('emailContatoOp').value    = d['Email Op'] || '';
+        setCheckboxValues('dias', d['Dias Funcionamento'] || '');
+        document.getElementById('horarioAbertura').value   = d['Abertura'] || '';
+        document.getElementById('horarioFechamento').value = d['Fechamento'] || '';
+        document.getElementById('feriados').value          = d['Feriados'] || '';
+        document.getElementById('perfilPublico').value     = d['Perfil Público'] || '';
+        document.getElementById('fluxoDiario').value       = d['Fluxo Diário'] || '';
+        document.getElementById('tempoPermanencia').value  = d['Tempo Permanência'] || '';
+        document.getElementById('internet').value          = d['Internet'] || '';
+        document.getElementById('tipoConexao').value       = d['Tipo Conexão'] || '';
+        document.getElementById('energiaProxima').value    = d['Energia Próxima'] || '';
+        document.getElementById('obsInfraestrutura').value = d['Obs Infraestrutura'] || '';
+        document.getElementById('comoChegou').value        = d['Como Chegou'] || '';
+        document.getElementById('responsavelProspeccao').value = d['Responsável Prospecção'] || '';
+        document.getElementById('dataPrimeiroContato').value   = d['Data Primeiro Contato'] || '';
+        document.getElementById('status').value            = d['Status'] || '';
+        document.getElementById('observacoesGerais').value = d['Observações'] || '';
+
+        trocarTab('tab-novo');
+        window.scrollTo(0, 0);
+      })
+      .catch(function(err){
+        alert('Erro ao buscar dados: ' + err.message);
+      });
   }
 
   document.getElementById('formCadastro').addEventListener('submit', function(e) {
@@ -381,7 +666,8 @@
     btn.innerHTML = '<span class="loading"></span> Salvando...';
 
     var dados = {
-      acao:                  'salvarEstabelecimento',
+      acao:                  linhaEmEdicao ? 'atualizarEstabelecimento' : 'salvarEstabelecimento',
+      linha:                 linhaEmEdicao,
       nomeFantasia:          document.getElementById('nomeFantasia').value,
       razaoSocial:           document.getElementById('razaoSocial').value,
       cnpj:                  document.getElementById('cnpj').value,
@@ -426,9 +712,17 @@
       .then(function(resultado) {
         if (resultado.sucesso) {
           alerta.className = 'alerta sucesso';
-          alerta.innerHTML = '✅ ' + resultado.mensagem + ' | ID: ' + resultado.id;
-          document.getElementById('formCadastro').reset();
-          document.getElementById('camposContatoOp').style.display = 'none';
+          alerta.innerHTML = '✅ ' + resultado.mensagem + (resultado.id ? ' | ID: ' + resultado.id : '');
+          if (linhaEmEdicao) {
+            carregarListaEstabelecimentos();
+          } else {
+            document.getElementById('formCadastro').reset();
+            document.getElementById('camposContatoOp').style.display = 'none';
+            document.getElementById('dataPrimeiroContato').value =
+              new Date().toISOString().split('T')[0];
+            carregarListaEstabelecimentos();
+          }
+          cancelarEdicao();
         } else {
           alerta.className = 'alerta erro';
           alerta.innerHTML = '❌ ' + resultado.mensagem;
@@ -446,6 +740,8 @@
         btn.innerHTML = '💾 Salvar Estabelecimento';
       });
   });
+
+  carregarListaEstabelecimentos();
 </script>
 </body>
 </html>
