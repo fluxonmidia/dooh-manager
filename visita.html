@@ -533,11 +533,14 @@
           })})
           .then(function(r){return r.json();})
           .then(function(resp){
-            if(resp.sucesso){
-              adicionarThumbExistente(pontoId, resp.url);
-            }
-            resolve(resp.sucesso);
-          })
+  console.log('Resposta uploadFoto:', resp);
+  if(resp.sucesso){
+    adicionarThumbExistente(pontoId, resp.url);
+  } else {
+    alert('Erro no uploadFoto: ' + (resp.mensagem || 'sem mensagem'));
+  }
+  resolve(resp.sucesso);
+})
           .catch(function(){resolve(false);});
         };
         reader.readAsDataURL(file);
