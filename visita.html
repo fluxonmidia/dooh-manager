@@ -310,7 +310,7 @@
     el.value = valor||'';
   }
 
-  // ─── Carregar select de estabelecimentos ────────────────────
+  // ─── Select de estabelecimentos ─────────────────────────────
   fetch(API_URL,{method:'POST',body:JSON.stringify({acao:'getEstabelecimentos'})})
     .then(function(r){return r.json();})
     .then(function(lista){
@@ -324,7 +324,7 @@
       });
     });
 
-  // ─── Pontos de instalação ────────────────────────────────────
+  // ─── Pontos ──────────────────────────────────────────────────
   function adicionarPonto(dados){
     contadorPontos++;
     var id=contadorPontos;
@@ -337,10 +337,10 @@
     var tamanhos=['32"','43"','50"','55"','65"','A definir'];
     var orientacoes=['Paisagem (horizontal)','Retrato (vertical)','A definir'];
 
-    function optionsHtml(lista, valorAtual){
+    function optHtml(lista, atual){
       return '<option value="">Selecione...</option>'+
         lista.map(function(o){
-          return '<option'+(valorAtual===o?' selected':'')+'>'+o+'</option>';
+          return '<option'+(atual===o?' selected':'')+'>'+o+'</option>';
         }).join('');
     }
 
@@ -353,16 +353,16 @@
 
       '<div class="form-row">'+
         '<div class="form-group"><label>Local no Ambiente</label>'+
-        '<select class="ponto-campo" data-campo="local">'+optionsHtml(locais,dados&&dados.local)+'</select></div>'+
+        '<select class="ponto-campo" data-campo="local">'+optHtml(locais,dados&&dados.local)+'</select></div>'+
         '<div class="form-group"><label>Tipo de Equipamento</label>'+
-        '<select class="ponto-campo" data-campo="tipoEquipamento">'+optionsHtml(tiposEquip,dados&&dados.tipoEquipamento)+'</select></div>'+
+        '<select class="ponto-campo" data-campo="tipoEquipamento">'+optHtml(tiposEquip,dados&&dados.tipoEquipamento)+'</select></div>'+
       '</div>'+
 
       '<div class="form-row">'+
         '<div class="form-group"><label>Tamanho Sugerido</label>'+
-        '<select class="ponto-campo" data-campo="tamanho">'+optionsHtml(tamanhos,dados&&dados.tamanho)+'</select></div>'+
+        '<select class="ponto-campo" data-campo="tamanho">'+optHtml(tamanhos,dados&&dados.tamanho)+'</select></div>'+
         '<div class="form-group"><label>Orientação da Tela</label>'+
-        '<select class="ponto-campo" data-campo="orientacao">'+optionsHtml(orientacoes,dados&&dados.orientacao)+'</select></div>'+
+        '<select class="ponto-campo" data-campo="orientacao">'+optHtml(orientacoes,dados&&dados.orientacao)+'</select></div>'+
       '</div>'+
 
       '<div class="form-group"><label>Observações do Ponto</label>'+
@@ -390,7 +390,6 @@
         adicionarMaterial(id,m.nome,m.quantidade);
       });
     }
-
     if(dados&&dados.fotos&&dados.fotos.length>0){
       dados.fotos.forEach(function(url){
         adicionarThumbExistente(id,url);
@@ -398,7 +397,7 @@
     }
   }
 
-  function adicionarMaterial(pontoId, nome, qtd){
+  function adicionarMaterial(pontoId,nome,qtd){
     var lista=document.getElementById('materiais-'+pontoId);
     var div=document.createElement('div');
     div.className='material-item';
@@ -409,7 +408,7 @@
     lista.appendChild(div);
   }
 
-  function adicionarThumbExistente(pontoId, url){
+  function adicionarThumbExistente(pontoId,url){
     var preview=document.getElementById('fotos-preview-'+pontoId);
     var div=document.createElement('div');
     div.className='foto-thumb';
@@ -420,26 +419,22 @@
     preview.appendChild(div);
   }
 
-  function processarFotos(input, pontoId){
+  function processarFotos(input,pontoId){
     var files=Array.from(input.files);
     if(!files.length) return;
     var status=document.getElementById('upload-status-'+pontoId);
     status.textContent='Enviando '+files.length+' foto(s)...';
-
     var promessas=files.map(function(file){
       return new Promise(function(resolve){
         var reader=new FileReader();
         reader.onload=function(e){
           var base64=e.target.result.split(',')[1];
-          fetch(API_URL,{
-            method:'POST',
-            body:JSON.stringify({
-              acao:'uploadFoto',
-              base64:base64,
-              nomeArquivo:file.name,
-              mimeType:file.type
-            })
-          })
+          fetch(API_URL,{method:'POST',body:JSON.stringify({
+            acao:'uploadFoto',
+            base64:base64,
+            nomeArquivo:file.name,
+            mimeType:file.type
+          })})
           .then(function(r){return r.json();})
           .then(function(resp){
             if(resp.sucesso) adicionarThumbExistente(pontoId,resp.url);
@@ -450,9 +445,221 @@
         reader.readAsDataURL(file);
       });
     });
-
     Promise.all(promessas).then(function(resultados){
       var ok=resultados.filter(Boolean).length;
-      status.textContent=ok+' de '+files.length+' foto(s) enviada(s) com sucesso.';
-      input
+      status.textContent=ok+' de '+files.length+' foto(s) enviada(s).';
+      input.value='';
+    });
+  }
 
+  function coletarPontos(){
+    var pontos=[];
+    document.querySelectorAll('.secao-ponto').forEach(function(secao){
+      var ponto={};
+      secao.querySelectorAll('.ponto-campo').forEach(function(campo){
+        ponto[campo.dataset.campo]=campo.value||'';
+      });
+      var materiais=[];
+      secao.querySelectorAll('.material-item').forEach(function(item){
+        var nome=(item.querySelector('.mat-nome').value||'').trim();
+        var qtd=parseInt(item.querySelector('.mat-qtd').value)||1;
+        if(nome) materiais.push({nome:nome,quantidade:qtd});
+      });
+      ponto.materiais=materiais;
+      var fotos=[];
+      secao.querySelectorAll('.foto-thumb').forEach(function(thumb){
+        if(thumb.dataset.url) fotos.push(thumb.dataset.url);
+      });
+      ponto.fotos=fotos;
+      pontos.push(ponto);
+    });
+    return pontos;
+  }
+
+  // ─── Cancelar edição ────────────────────────────────────────
+  function cancelarEdicao(){
+    linhaEmEdicao=null;
+    idEmEdicao=null;
+    document.getElementById('infoEdicao').style.display='none';
+    document.getElementById('formVisita').reset();
+    document.getElementById('listaPontos').innerHTML='';
+    document.getElementById('camposWifi').style.display='none';
+    contadorPontos=0;
+    document.getElementById('dataVisita').value=
+      new Date().toISOString().split('T')[0];
+    document.getElementById('btnSubmit').innerHTML='💾 Salvar Visita Técnica';
+  }
+
+  // ─── Carregar lista ─────────────────────────────────────────
+  function carregarLista(){
+    var tbody=document.querySelector('#tabelaVisitas tbody');
+    tbody.innerHTML='<tr><td colspan="6">Carregando...</td></tr>';
+    fetch(API_URL,{method:'POST',body:JSON.stringify({acao:'listarVisitas'})})
+      .then(function(r){return r.json();})
+      .then(function(resp){
+        if(!resp.sucesso){
+          tbody.innerHTML='<tr><td colspan="6">Erro: '+resp.mensagem+'</td></tr>';
+          return;
+        }
+        listaGlobal=resp.visitas||[];
+        renderTabela(listaGlobal);
+      })
+      .catch(function(err){
+        tbody.innerHTML='<tr><td colspan="6">Erro: '+err.message+'</td></tr>';
+      });
+  }
+
+  function renderTabela(lista){
+    var tbody=document.querySelector('#tabelaVisitas tbody');
+    tbody.innerHTML='';
+    if(lista.length===0){
+      tbody.innerHTML='<tr><td colspan="6">Nenhuma visita registrada.</td></tr>';
+      return;
+    }
+    lista.forEach(function(vis){
+      var tr=document.createElement('tr');
+      tr.innerHTML=
+        '<td>'+vis.id+'</td>'+
+        '<td>'+vis.estabelecimento+'</td>'+
+        '<td><span class="badge badge-data">'+(vis.dataVisita||'-')+'</span></td>'+
+        '<td>'+(vis.responsavel||'-')+'</td>'+
+        '<td><span class="badge badge-status">'+(vis.viabilidade||'-')+'</span></td>'+
+        '<td>'+(vis.totalPontos||'0')+'</td>';
+      tr.addEventListener('click',function(){
+        editarVisita(vis.linha,vis.id,vis.estabelecimento,vis.dataVisita);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById('filtroEstabelecimento').addEventListener('input',aplicarFiltros);
+  document.getElementById('filtroResponsavel').addEventListener('input',aplicarFiltros);
+
+  function aplicarFiltros(){
+    var est=document.getElementById('filtroEstabelecimento').value.toLowerCase();
+    var resp=document.getElementById('filtroResponsavel').value.toLowerCase();
+    var filtrada=listaGlobal.filter(function(v){
+      var okEst=!est||(v.estabelecimento||'').toLowerCase().indexOf(est)!==-1;
+      var okResp=!resp||(v.responsavel||'').toLowerCase().indexOf(resp)!==-1;
+      return okEst&&okResp;
+    });
+    renderTabela(filtrada);
+  }
+
+  // ─── Editar ─────────────────────────────────────────────────
+  function editarVisita(linha,id,estabelecimento,dataVisita){
+    fetch(API_URL,{method:'POST',body:JSON.stringify({acao:'buscarVisita',linha:linha})})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(!d.sucesso){alert('Erro: '+d.mensagem);return;}
+
+        linhaEmEdicao=linha;
+        idEmEdicao=id;
+
+        document.getElementById('infoEdicao').style.display='block';
+        document.getElementById('infoEdicaoDesc').textContent=estabelecimento+' — '+dataVisita;
+        document.getElementById('infoEdicaoId').textContent=id;
+        document.getElementById('btnSubmit').innerHTML='💾 Salvar Alterações';
+
+        document.getElementById('listaPontos').innerHTML='';
+        contadorPontos=0;
+
+        setSelect('estabelecimento',      d['Estabelecimento']);
+        document.getElementById('dataVisita').value        = d['Data Visita']              ||'';
+        document.getElementById('responsavelVisita').value = d['Responsável Visita']       ||'';
+        document.getElementById('contatoLocal').value      = d['Contato no Local']         ||'';
+
+        var internet=d['Internet Local']||'';
+        setSelect('internetLocal',internet);
+        document.getElementById('camposWifi').style.display=internet==='Sim'?'block':'none';
+
+        setSelect('tipoConexao',          d['Tipo Conexão']);
+        setSelect('qualidadeWifi',        d['Qualidade WiFi']);
+        document.getElementById('senhaWifi').value         = d['Senha WiFi']               ||'';
+        setSelect('tensaoEletrica',       d['Tensão Elétrica']);
+        setSelect('tomadasProximas',      d['Tomadas Próximas']);
+        setSelect('extensaoNecessaria',   d['Extensão Necessária']);
+        document.getElementById('obsInfraestrutura').value = d['Obs Infraestrutura']       ||'';
+        document.getElementById('totalPontos').value       = d['Total Pontos']             ||'';
+        setSelect('viabilidadeGeral',     d['Viabilidade Geral']);
+        document.getElementById('desafios').value          = d['Desafios']                 ||'';
+        document.getElementById('equipamentosNecessarios').value = d['Equipamentos Necessários'] ||'';
+        document.getElementById('dataInstalacao').value    = d['Data Sugerida Instalação'] ||'';
+        setSelect('apoioExterno',         d['Apoio Externo']);
+        document.getElementById('observacoesFinais').value = d['Observações Finais']       ||'';
+
+        var pontosJSON=d['Pontos Detalhados (JSON)']||'[]';
+        var pontos=[];
+        try{ pontos=JSON.parse(pontosJSON); }catch(e){ pontos=[]; }
+        pontos.forEach(function(p){ adicionarPonto(p); });
+
+        trocarTab('tab-nova');
+        window.scrollTo(0,0);
+      })
+      .catch(function(err){alert('Erro: '+err.message);});
+  }
+
+  // ─── Submit ─────────────────────────────────────────────────
+  document.getElementById('formVisita').addEventListener('submit',function(e){
+    e.preventDefault();
+    var btn=document.getElementById('btnSubmit');
+    var alerta=document.getElementById('alerta');
+    alerta.style.display='none';
+    btn.disabled=true;
+    btn.innerHTML='<span class="loading"></span> Salvando...';
+
+    var dados={
+      acao:                    linhaEmEdicao?'atualizarVisita':'salvarVisita',
+      linha:                   linhaEmEdicao,
+      estabelecimento:         document.getElementById('estabelecimento').value,
+      dataVisita:              document.getElementById('dataVisita').value,
+      responsavelVisita:       document.getElementById('responsavelVisita').value,
+      contatoLocal:            document.getElementById('contatoLocal').value,
+      internetLocal:           document.getElementById('internetLocal').value,
+      tipoConexao:             document.getElementById('tipoConexao').value,
+      qualidadeWifi:           document.getElementById('qualidadeWifi').value,
+      senhaWifi:               document.getElementById('senhaWifi').value,
+      tensaoEletrica:          document.getElementById('tensaoEletrica').value,
+      tomadasProximas:         document.getElementById('tomadasProximas').value,
+      extensaoNecessaria:      document.getElementById('extensaoNecessaria').value,
+      obsInfraestrutura:       document.getElementById('obsInfraestrutura').value,
+      totalPontos:             document.getElementById('totalPontos').value,
+      viabilidadeGeral:        document.getElementById('viabilidadeGeral').value,
+      desafios:                document.getElementById('desafios').value,
+      equipamentosNecessarios: document.getElementById('equipamentosNecessarios').value,
+      dataInstalacao:          document.getElementById('dataInstalacao').value,
+      apoioExterno:            document.getElementById('apoioExterno').value,
+      observacoesFinais:       document.getElementById('observacoesFinais').value,
+      pontos:                  coletarPontos()
+    };
+
+    fetch(API_URL,{method:'POST',body:JSON.stringify(dados)})
+      .then(function(r){return r.json();})
+      .then(function(resultado){
+        if(resultado.sucesso){
+          alerta.className='alerta sucesso';
+          alerta.innerHTML='✅ '+resultado.mensagem+(resultado.id?' | ID: '+resultado.id:'');
+          cancelarEdicao();
+          carregarLista();
+        }else{
+          alerta.className='alerta erro';
+          alerta.innerHTML='❌ '+resultado.mensagem;
+        }
+        alerta.style.display='block';
+        window.scrollTo(0,0);
+        btn.disabled=false;
+        btn.innerHTML='💾 Salvar Visita Técnica';
+      })
+      .catch(function(err){
+        alerta.className='alerta erro';
+        alerta.innerHTML='❌ Erro de conexão: '+err.message;
+        alerta.style.display='block';
+        btn.disabled=false;
+        btn.innerHTML='💾 Salvar Visita Técnica';
+      });
+  });
+
+  carregarLista();
+</script>
+</body>
+</html>
