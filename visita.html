@@ -5,6 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Visita Técnica</title>
   <link rel="stylesheet" href="estilo.css">
+  <style>
+    .tabs { display:flex; gap:8px; margin-bottom:16px; border-bottom:1px solid #ddd; }
+    .tab-btn { padding:8px 16px; border:none; background:transparent; cursor:pointer; font-weight:600; border-bottom:3px solid transparent; font-size:14px; }
+    .tab-btn.ativo { border-bottom-color:#1a73e8; color:#1a73e8; }
+    .tab-conteudo { display:none; }
+    .tab-conteudo.ativo { display:block; }
+
+    table.listagem { width:100%; border-collapse:collapse; margin-top:8px; font-size:14px; }
+    table.listagem th, table.listagem td { border:1px solid #eee; padding:6px 8px; text-align:left; }
+    table.listagem th { background:#f5f5f5; }
+    table.listagem tr:hover { background:#f0f7ff; cursor:pointer; }
+
+    .badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; }
+    .badge-status { background:#e3f2fd; color:#1a73e8; }
+    .badge-data { background:#f1f8e9; color:#558b2f; }
+
+    .info-edicao { font-size:13px; color:#555; margin-bottom:12px; background:#fff8e1; border:1px solid #ffe082; border-radius:6px; padding:8px 12px; }
+    .info-edicao span { font-weight:600; color:#333; }
+    .btn-secundario { background:#fff; color:#1a73e8; border:1px solid #1a73e8; padding:5px 12px; border-radius:4px; cursor:pointer; font-size:13px; margin-left:8px; }
+
+    .secao-ponto { border:1px solid #ddd; border-radius:8px; padding:16px; margin-bottom:16px; background:#fafafa; position:relative; }
+    .secao-ponto h3 { margin:0 0 12px 0; font-size:15px; color:#1a73e8; }
+    .btn-remove { position:absolute; top:12px; right:12px; background:#fff; color:#e53935; border:1px solid #e53935; padding:3px 10px; border-radius:4px; cursor:pointer; font-size:12px; }
+    .btn-add-ponto { background:#1a73e8; color:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-size:14px; margin-top:8px; width:100%; }
+    .btn-add-ponto:hover { background:#1557b0; }
+
+    /* Materiais */
+    .materiais-lista { margin-top:8px; }
+    .material-item { display:flex; gap:8px; align-items:center; margin-bottom:6px; }
+    .material-item input[type="text"] { flex:3; }
+    .material-item input[type="number"] { flex:1; min-width:60px; }
+    .btn-remove-material { background:#fff; color:#e53935; border:1px solid #e53935; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:12px; white-space:nowrap; }
+    .btn-add-material { background:#fff; color:#1a73e8; border:1px solid #1a73e8; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px; margin-top:4px; }
+
+    /* Fotos */
+    .fotos-preview { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .foto-thumb { position:relative; width:80px; height:80px; }
+    .foto-thumb img { width:80px; height:80px; object-fit:cover; border-radius:6px; border:1px solid #ddd; }
+    .foto-thumb .btn-remove-foto { position:absolute; top:-6px; right:-6px; background:#e53935; color:#fff; border:none; border-radius:50%; width:20px; height:20px; font-size:12px; cursor:pointer; line-height:20px; text-align:center; padding:0; }
+    .upload-status { font-size:12px; color:#888; margin-top:4px; }
+    .upload-btn-label { display:inline-block; background:#fff; color:#1a73e8; border:1px solid #1a73e8; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px; margin-top:4px; }
+    .upload-btn-label input[type="file"] { display:none; }
+  </style>
 </head>
 <body>
 
@@ -17,251 +60,584 @@
 </div>
 
 <div class="container">
-  <div id="alerta" class="alerta"></div>
-  <form id="formVisita">
+  <div class="tabs">
+    <button class="tab-btn ativo" data-tab="tab-nova">Nova Visita</button>
+    <button class="tab-btn" data-tab="tab-consulta">Consultar / Editar</button>
+  </div>
 
-    <div class="card">
-      <h2>📋 Identificação</h2>
-      <div class="form-group">
-        <label>Estabelecimento <span class="obrigatorio">*</span></label>
-        <select id="estabelecimento" required>
-          <option value="">Carregando lista...</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Data da Visita <span class="obrigatorio">*</span></label>
-          <input type="date" id="dataVisita" required>
-        </div>
-        <div class="form-group">
-          <label>Responsável pela Visita <span class="obrigatorio">*</span></label>
-          <input type="text" id="responsavelVisita" required>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Contato no Local <span class="opcional">(opcional)</span></label>
-        <input type="text" id="contatoLocal" placeholder="(00) 00000-0000" maxlength="15"
-          oninput="
-            var v = this.value.replace(/\D/g,'').substring(0,11);
-            if(v.length===0){this.value='';return;}
-            if(v.length<=2) v='('+v;
-            else if(v.length<=6) v='('+v.substring(0,2)+') '+v.substring(2);
-            else if(v.length<=10) v='('+v.substring(0,2)+') '+v.substring(2,6)+'-'+v.substring(6);
-            else v='('+v.substring(0,2)+') '+v.substring(2,7)+'-'+v.substring(7);
-            this.value=v;
-          ">
-      </div>
+  <div id="alerta" class="alerta"></div>
+
+  <!-- ═══ ABA NOVA VISITA ═══ -->
+  <div id="tab-nova" class="tab-conteudo ativo">
+
+    <div id="infoEdicao" class="info-edicao" style="display:none;">
+      Editando visita: <span id="infoEdicaoDesc"></span> &nbsp;|&nbsp; ID: <span id="infoEdicaoId"></span>
+      <button type="button" class="btn-secundario" onclick="cancelarEdicao()">✕ Cancelar edição</button>
     </div>
 
-    <div class="card">
-      <h2>⚡ Infraestrutura Geral</h2>
-      <div class="form-group">
-        <label>Internet disponível no local? <span class="obrigatorio">*</span></label>
-        <select id="internetLocal" required onchange="
-          document.getElementById('camposWifi').style.display =
-            this.value === 'Sim' ? 'block' : 'none';
-        ">
-          <option value="">Selecione...</option>
-          <option>Sim</option>
-          <option>Não</option>
-        </select>
-      </div>
-      <div id="camposWifi" style="display:none;">
+    <form id="formVisita">
+
+      <div class="card">
+        <h2>📋 Identificação</h2>
+        <div class="form-group">
+          <label>Estabelecimento <span class="obrigatorio">*</span></label>
+          <select id="estabelecimento" required>
+            <option value="">Carregando...</option>
+          </select>
+        </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Tipo de Conexão</label>
-            <select id="tipoConexao">
+            <label>Data da Visita <span class="obrigatorio">*</span></label>
+            <input type="date" id="dataVisita" required>
+          </div>
+          <div class="form-group">
+            <label>Responsável pela Visita <span class="obrigatorio">*</span></label>
+            <input type="text" id="responsavelVisita" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Contato no Local</label>
+          <input type="text" id="contatoLocal" placeholder="(00) 00000-0000" maxlength="15"
+            oninput="
+              var v=this.value.replace(/\D/g,'').substring(0,11);
+              if(v.length===0){this.value='';return;}
+              if(v.length<=2)v='('+v;
+              else if(v.length<=6)v='('+v.substring(0,2)+') '+v.substring(2);
+              else if(v.length<=10)v='('+v.substring(0,2)+') '+v.substring(2,6)+'-'+v.substring(6);
+              else v='('+v.substring(0,2)+') '+v.substring(2,7)+'-'+v.substring(7);
+              this.value=v;
+            ">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>⚡ Infraestrutura</h2>
+        <div class="form-group">
+          <label>Internet disponível? <span class="obrigatorio">*</span></label>
+          <select id="internetLocal" required onchange="
+            document.getElementById('camposWifi').style.display=
+              this.value==='Sim'?'block':'none';
+          ">
+            <option value="">Selecione...</option>
+            <option>Sim</option>
+            <option>Não</option>
+          </select>
+        </div>
+        <div id="camposWifi" style="display:none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tipo de Conexão</label>
+              <select id="tipoConexao">
+                <option value="">Selecione...</option>
+                <option>Wi-Fi</option>
+                <option>Cabo (Ethernet)</option>
+                <option>Ambos</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Qualidade do Sinal</label>
+              <select id="qualidadeWifi">
+                <option value="">Selecione...</option>
+                <option>Excelente</option>
+                <option>Boa</option>
+                <option>Regular</option>
+                <option>Fraca</option>
+                <option>Não testado</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Senha do Wi-Fi</label>
+            <input type="text" id="senhaWifi">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tensão Elétrica</label>
+            <select id="tensaoEletrica">
               <option value="">Selecione...</option>
-              <option>Wi-Fi</option>
-              <option>Cabo (Ethernet)</option>
-              <option>Ambos</option>
+              <option>110V / 127V</option>
+              <option>220V</option>
+              <option>Ambas</option>
+              <option>Não verificado</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Qualidade do Sinal Wi-Fi</label>
-            <select id="qualidadeWifi">
+            <label>Tomadas Próximas?</label>
+            <select id="tomadasProximas">
               <option value="">Selecione...</option>
-              <option>Excelente</option>
-              <option>Boa</option>
-              <option>Regular</option>
-              <option>Fraca</option>
-              <option>Não testado</option>
+              <option>Sim, em todos os pontos</option>
+              <option>Em alguns pontos</option>
+              <option>Em nenhum ponto</option>
             </select>
           </div>
         </div>
         <div class="form-group">
-          <label>Senha do Wi-Fi <span class="opcional">(opcional)</span></label>
-          <input type="text" id="senhaWifi">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Tensão Elétrica <span class="obrigatorio">*</span></label>
-          <select id="tensaoEletrica" required>
+          <label>Extensão Necessária?</label>
+          <select id="extensaoNecessaria">
             <option value="">Selecione...</option>
-            <option>110V / 127V</option>
-            <option>220V</option>
-            <option>Ambas</option>
-            <option>Não verificado</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Tomadas Próximas? <span class="obrigatorio">*</span></label>
-          <select id="tomadasProximas" required>
-            <option value="">Selecione...</option>
-            <option>Sim, em todos os pontos</option>
-            <option>Em alguns pontos</option>
-            <option>Em nenhum ponto</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Extensão ou Régua necessária?</label>
-        <select id="extensaoNecessaria">
-          <option value="">Selecione...</option>
-          <option>Sim</option>
-          <option>Não</option>
-          <option>A avaliar</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Observações de Infraestrutura <span class="opcional">(opcional)</span></label>
-        <textarea id="obsInfraestrutura"></textarea>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>📺 Pontos de Instalação</h2>
-      <div id="listaPontos"></div>
-      <button type="button" class="btn-add-ponto" onclick="adicionarPonto()">+ Adicionar Ponto de Instalação</button>
-    </div>
-
-    <div class="card">
-      <h2>📊 Resumo da Visita</h2>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Total de Pontos Mapeados <span class="obrigatorio">*</span></label>
-          <input type="number" id="totalPontos" required min="0">
-        </div>
-        <div class="form-group">
-          <label>Viabilidade Técnica Geral <span class="obrigatorio">*</span></label>
-          <select id="viabilidadeGeral" required>
-            <option value="">Selecione...</option>
-            <option>Totalmente viável</option>
-            <option>Viável com pequenas adaptações</option>
-            <option>Viável com adaptações significativas</option>
-            <option>Inviável no momento</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Principais Desafios <span class="opcional">(opcional)</span></label>
-        <textarea id="desafios"></textarea>
-      </div>
-      <div class="form-group">
-        <label>Materiais Necessários <span class="obrigatorio">*</span></label>
-        <textarea id="materiaisNecessarios" required></textarea>
-      </div>
-      <div class="form-group">
-        <label>Equipamentos a Separar/Comprar <span class="obrigatorio">*</span></label>
-        <textarea id="equipamentosNecessarios" required></textarea>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Data Sugerida para Instalação <span class="opcional">(opcional)</span></label>
-          <input type="date" id="dataInstalacao">
-        </div>
-        <div class="form-group">
-          <label>Apoio Externo Necessário?</label>
-          <select id="apoioExterno">
-            <option value="">Selecione...</option>
+            <option>Sim</option>
             <option>Não</option>
-            <option>Sim, eletricista</option>
-            <option>Sim, marcenaria</option>
-            <option>Sim, outro</option>
+            <option>A avaliar</option>
           </select>
         </div>
+        <div class="form-group">
+          <label>Obs Infraestrutura</label>
+          <textarea id="obsInfraestrutura"></textarea>
+        </div>
       </div>
-      <div class="form-group">
-        <label>Observações Finais <span class="opcional">(opcional)</span></label>
-        <textarea id="observacoesFinais"></textarea>
-      </div>
-    </div>
 
-    <button type="submit" class="btn-submit" id="btnSubmit">💾 Salvar Visita Técnica</button>
-  </form>
+      <div class="card">
+        <h2>📺 Pontos de Instalação</h2>
+        <div id="listaPontos"></div>
+        <button type="button" class="btn-add-ponto" onclick="adicionarPonto()">+ Adicionar Ponto de Instalação</button>
+      </div>
+
+      <div class="card">
+        <h2>📊 Resumo da Visita</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Total de Pontos Mapeados <span class="obrigatorio">*</span></label>
+            <input type="number" id="totalPontos" required min="0">
+          </div>
+          <div class="form-group">
+            <label>Viabilidade Técnica <span class="obrigatorio">*</span></label>
+            <select id="viabilidadeGeral" required>
+              <option value="">Selecione...</option>
+              <option>Totalmente viável</option>
+              <option>Viável com pequenas adaptações</option>
+              <option>Viável com adaptações significativas</option>
+              <option>Inviável no momento</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Principais Desafios</label>
+          <textarea id="desafios"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Equipamentos a Separar/Comprar <span class="obrigatorio">*</span></label>
+          <textarea id="equipamentosNecessarios" required></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data Sugerida para Instalação</label>
+            <input type="date" id="dataInstalacao">
+          </div>
+          <div class="form-group">
+            <label>Apoio Externo Necessário?</label>
+            <select id="apoioExterno">
+              <option value="">Selecione...</option>
+              <option>Não</option>
+              <option>Sim, eletricista</option>
+              <option>Sim, marcenaria</option>
+              <option>Sim, outro</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Observações Finais</label>
+          <textarea id="observacoesFinais"></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="btnSubmit">💾 Salvar Visita Técnica</button>
+    </form>
+  </div>
+
+  <!-- ═══ ABA CONSULTA ═══ -->
+  <div id="tab-consulta" class="tab-conteudo">
+    <div class="card">
+      <h2>📚 Visitas Registradas</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Filtrar por estabelecimento</label>
+          <input type="text" id="filtroEstabelecimento">
+        </div>
+        <div class="form-group">
+          <label>Filtrar por responsável</label>
+          <input type="text" id="filtroResponsavel">
+        </div>
+      </div>
+      <table class="listagem" id="tabelaVisitas">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Estabelecimento</th>
+            <th>Data</th>
+            <th>Responsável</th>
+            <th>Viabilidade</th>
+            <th>Pontos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="6">Carregando...</td></tr>
+        </tbody>
+      </table>
+      <div class="hint" style="margin-top:8px;">Clique em uma linha para editar a visita.</div>
+    </div>
+  </div>
 </div>
 
 <script>
   var API_URL = 'https://script.google.com/macros/s/AKfycbwtA46Q55_pTTPzTh9aXjQh2syF27IYWk0ZRO50KNhCmEdfOQtKqZ8pKazn7l9mvFuAeg/exec';
+  var linhaEmEdicao  = null;
+  var idEmEdicao     = null;
+  var listaGlobal    = [];
   var contadorPontos = 0;
 
-  document.getElementById('dataVisita').value = new Date().toISOString().split('T')[0];
+  document.getElementById('dataVisita').value =
+    new Date().toISOString().split('T')[0];
 
-  fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: 'getEstabelecimentos' }) })
-    .then(function(r) { return r.json(); })
-    .then(function(lista) {
-      var select = document.getElementById('estabelecimento');
-      select.innerHTML = '<option value="">Selecione...</option>';
-      if (!lista || lista.length === 0) {
-        select.innerHTML = '<option value="">Nenhum estabelecimento cadastrado</option>';
-        return;
-      }
-      lista.forEach(function(est) {
-        var opt = document.createElement('option');
-        opt.value = est.nome;
-        opt.textContent = est.nome;
-        select.appendChild(opt);
-      });
-    })
-    .catch(function() {
-      document.getElementById('estabelecimento').innerHTML = '<option value="">Erro ao carregar</option>';
+  // ─── Abas ───────────────────────────────────────────────────
+  document.querySelectorAll('.tab-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      trocarTab(this.dataset.tab);
     });
+  });
 
-  function adicionarPonto() {
-    contadorPontos++;
-    var id = contadorPontos;
-    var div = document.createElement('div');
-    div.className = 'secao-ponto';
-    div.id = 'ponto-' + id;
-    div.innerHTML =
-      '<h3>📍 Ponto ' + id + '</h3>' +
-      '<button type="button" class="btn-remove" onclick="document.getElementById(\'ponto-' + id + '\').remove()">✕ Remover</button>' +
-      '<div class="form-group"><label>Identificação</label><input type="text" class="ponto-campo" data-campo="identificacao" placeholder="Ex.: Entrada principal"></div>' +
-      '<div class="form-row">' +
-        '<div class="form-group"><label>Local no Ambiente</label><select class="ponto-campo" data-campo="local"><option value="">Selecione...</option><option>Entrada</option><option>Recepção</option><option>Caixa / Checkout</option><option>Balcão</option><option>Salão / Área principal</option><option>Sala de espera</option><option>Corredor</option><option>Outro</option></select></div>' +
-        '<div class="form-group"><label>Tipo de Equipamento</label><select class="ponto-campo" data-campo="tipoEquipamento"><option value="">Selecione...</option><option>TV nova (instalada por nós)</option><option>TV existente do estabelecimento</option><option>Totem LED</option><option>Outro</option></select></div>' +
-      '</div>' +
-      '<div class="form-row">' +
-        '<div class="form-group"><label>Tamanho Sugerido</label><select class="ponto-campo" data-campo="tamanho"><option value="">Selecione...</option><option>32"</option><option>43"</option><option>50"</option><option>55"</option><option>65"</option><option>A definir</option></select></div>' +
-        '<div class="form-group"><label>Orientação da Tela</label><select class="ponto-campo" data-campo="orientacao"><option value="">Selecione...</option><option>Paisagem (horizontal)</option><option>Retrato (vertical)</option><option>A definir</option></select></div>' +
-      '</div>' +
-      '<div class="form-group"><label>Observações do Ponto</label><textarea class="ponto-campo" data-campo="observacoes"></textarea></div>';
-    document.getElementById('listaPontos').appendChild(div);
+  function trocarTab(idTab){
+    document.querySelectorAll('.tab-btn').forEach(function(b){
+      b.classList.toggle('ativo', b.dataset.tab===idTab);
+    });
+    document.querySelectorAll('.tab-conteudo').forEach(function(div){
+      div.classList.toggle('ativo', div.id===idTab);
+    });
+    if(idTab==='tab-consulta') carregarLista();
   }
 
-  function coletarPontos() {
-    var pontos = [];
-    document.querySelectorAll('.secao-ponto').forEach(function(secao) {
-      var ponto = {};
-      secao.querySelectorAll('.ponto-campo').forEach(function(campo) {
-        ponto[campo.dataset.campo] = campo.value || '';
+  function setSelect(id, valor){
+    var el=document.getElementById(id);
+    if(!el) return;
+    el.value = valor||'';
+  }
+
+  // ─── Carregar select de estabelecimentos ────────────────────
+  fetch(API_URL,{method:'POST',body:JSON.stringify({acao:'getEstabelecimentos'})})
+    .then(function(r){return r.json();})
+    .then(function(lista){
+      var sel=document.getElementById('estabelecimento');
+      sel.innerHTML='<option value="">Selecione...</option>';
+      (lista||[]).forEach(function(est){
+        var o=document.createElement('option');
+        o.value=est.nome; o.textContent=est.nome;
+        sel.appendChild(o);
       });
+    });
+
+  // ─── Pontos de instalação ────────────────────────────────────
+  function adicionarPonto(dados){
+    contadorPontos++;
+    var id=contadorPontos;
+    var div=document.createElement('div');
+    div.className='secao-ponto';
+    div.id='ponto-'+id;
+
+    div.innerHTML=
+      '<h3>📍 Ponto '+id+'</h3>'+
+      '<button type="button" class="btn-remove" onclick="document.getElementById(\'ponto-'+id+'\').remove()">✕ Remover</button>'+
+
+      '<div class="form-group"><label>Identificação</label>'+
+      '<input type="text" class="ponto-campo" data-campo="identificacao" placeholder="Ex.: Entrada principal" value="'+(dados&&dados.identificacao?dados.identificacao:'')+'"></div>'+
+
+      '<div class="form-row">'+
+        '<div class="form-group"><label>Local no Ambiente</label>'+
+        '<select class="ponto-campo" data-campo="local">'+
+          '<option value="">Selecione...</option>'+
+          ['Entrada','Recepção','Caixa / Checkout','Balcão','Salão / Área principal','Sala de espera','Corredor','Outro']
+          .map(function(o){return '<option'+(dados&&dados.local===o?' selected':'')+'>'+o+'</option>';}).join('')+
+        '</select></div>'+
+        '<div class="form-group"><label>Tipo de Equipamento</label>'+
+        '<select class="ponto-campo" data-campo="tipoEquipamento">'+
+          '<option value="">Selecione...</option>'+
+          ['TV nova (instalada por nós)','TV existente do estabelecimento','Totem LED','Outro']
+          .map(function(o){return '<option'+(dados&&dados.tipoEquipamento===o?' selected':'')+'>'+o+'</option>';}).join('')+
+        '</select></div>'+
+      '</div>'+
+
+      '<div class="form-row">'+
+        '<div class="form-group"><label>Tamanho Sugerido</label>'+
+        '<select class="ponto-campo" data-campo="tamanho">'+
+          '<option value="">Selecione...</option>'+
+          ['32"','43"','50"','55"','65"','A definir']
+          .map(function(o){return '<option'+(dados&&dados.tamanho===o?' selected':'')+'>'+o+'</option>';}).join('')+
+        '</select></div>'+
+        '<div class="form-group"><label>Orientação da Tela</label>'+
+        '<select class="ponto-campo" data-campo="orientacao">'+
+          '<option value="">Selecione...</option>'+
+          ['Paisagem (horizontal)','Retrato (vertical)','A definir']
+          .map(function(o){return '<option'+(dados&&dados.orientacao===o?' selected':'')+'>'+o+'</option>';}).join('')+
+        '</select></div>'+
+      '</div>'+
+
+      '<div class="form-group"><label>Observações do Ponto</label>'+
+      '<textarea class="ponto-campo" data-campo="observacoes">'+(dados&&dados.observacoes?dados.observacoes:'')+'</textarea></div>'+
+
+      // Materiais
+      '<div class="form-group">'+
+        '<label>🔩 Materiais Necessários</label>'+
+        '<div class="materiais-lista" id="materiais-'+id+'"></div>'+
+        '<button type="button" class="btn-add-material" onclick="adicionarMaterial('+id+')">+ Adicionar Material</button>'+
+      '</div>'+
+
+      // Fotos
+      '<div class="form-group">'+
+        '<label>📷 Fotos do Ponto</label>'+
+        '<div class="fotos-preview" id="fotos-preview-'+id+'"></div>'+
+        '<div class="upload-status" id="upload-status-'+id+'"></div>'+
+        '<label class="upload-btn-label">'+
+          '📎 Selecionar Foto'+
+          '<input type="file" accept="image/*" multiple onchange="processarFotos(this, '+id+')">'+
+        '</label>'+
+      '</div>';
+
+    document.getElementById('listaPontos').appendChild(div);
+
+    // Se veio com dados de materiais, preenche
+    if(dados && dados.materiais && dados.materiais.length>0){
+      dados.materiais.forEach(function(m){
+        adicionarMaterial(id, m.nome, m.quantidade);
+      });
+    }
+
+    // Se veio com fotos já salvas, mostra thumbs
+    if(dados && dados.fotos && dados.fotos.length>0){
+      dados.fotos.forEach(function(url){
+        adicionarThumbExistente(id, url);
+      });
+    }
+  }
+
+  function adicionarMaterial(pontoId, nome, qtd){
+    var lista=document.getElementById('materiais-'+pontoId);
+    var div=document.createElement('div');
+    div.className='material-item';
+    div.innerHTML=
+      '<input type="text" placeholder="Nome do material" value="'+(nome||'')+'" class="mat-nome">'+
+      '<input type="number" placeholder="Qtd" min="1" value="'+(qtd||1)+'" class="mat-qtd">'+
+      '<button type="button" class="btn-remove-material" onclick="this.parentElement.remove()">✕</button>';
+    lista.appendChild(div);
+  }
+
+  function adicionarThumbExistente(pontoId, url){
+    var preview=document.getElementById('fotos-preview-'+pontoId);
+    var div=document.createElement('div');
+    div.className='foto-thumb';
+    div.dataset.url=url;
+    div.innerHTML=
+      '<img src="'+url+'" alt="Foto">'+
+      '<button type="button" class="btn-remove-foto" onclick="this.parentElement.remove()">✕</button>';
+    preview.appendChild(div);
+  }
+
+  function processarFotos(input, pontoId){
+    var files=Array.from(input.files);
+    if(!files.length) return;
+    var status=document.getElementById('upload-status-'+pontoId);
+    status.textContent='Enviando '+files.length+' foto(s)...';
+
+    var promessas=files.map(function(file){
+      return new Promise(function(resolve){
+        var reader=new FileReader();
+        reader.onload=function(e){
+          var base64=e.target.result.split(',')[1];
+          fetch(API_URL,{
+            method:'POST',
+            body:JSON.stringify({
+              acao:'uploadFoto',
+              base64:base64,
+              nomeArquivo:file.name,
+              mimeType:file.type
+            })
+          })
+          .then(function(r){return r.json();})
+          .then(function(resp){
+            if(resp.sucesso){
+              adicionarThumbExistente(pontoId, resp.url);
+            }
+            resolve(resp.sucesso);
+          })
+          .catch(function(){resolve(false);});
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    Promise.all(promessas).then(function(resultados){
+      var ok=resultados.filter(Boolean).length;
+      status.textContent=ok+' de '+files.length+' foto(s) enviada(s) com sucesso.';
+      input.value='';
+    });
+  }
+
+  function coletarPontos(){
+    var pontos=[];
+    document.querySelectorAll('.secao-ponto').forEach(function(secao){
+      var ponto={};
+      secao.querySelectorAll('.ponto-campo').forEach(function(campo){
+        ponto[campo.dataset.campo]=campo.value||'';
+      });
+
+      // Materiais
+      var materiais=[];
+      secao.querySelectorAll('.material-item').forEach(function(item){
+        var nome=(item.querySelector('.mat-nome').value||'').trim();
+        var qtd =parseInt(item.querySelector('.mat-qtd').value)||1;
+        if(nome) materiais.push({nome:nome, quantidade:qtd});
+      });
+      ponto.materiais=materiais;
+
+      // Fotos (URLs já upadas)
+      var fotos=[];
+      secao.querySelectorAll('.foto-thumb').forEach(function(thumb){
+        if(thumb.dataset.url) fotos.push(thumb.dataset.url);
+      });
+      ponto.fotos=fotos;
+
       pontos.push(ponto);
     });
     return pontos;
   }
 
-  document.getElementById('formVisita').addEventListener('submit', function(e) {
-    e.preventDefault();
-    var btn    = document.getElementById('btnSubmit');
-    var alerta = document.getElementById('alerta');
-    alerta.style.display = 'none';
-    btn.disabled = true;
-    btn.innerHTML = '<span class="loading"></span> Salvando...';
+  // ─── Cancelar edição ────────────────────────────────────────
+  function cancelarEdicao(){
+    linhaEmEdicao=null;
+    idEmEdicao=null;
+    document.getElementById('infoEdicao').style.display='none';
+    document.getElementById('formVisita').reset();
+    document.getElementById('listaPontos').innerHTML='';
+    document.getElementById('camposWifi').style.display='none';
+    contadorPontos=0;
+    document.getElementById('dataVisita').value=
+      new Date().toISOString().split('T')[0];
+    document.getElementById('btnSubmit').innerHTML='💾 Salvar Visita Técnica';
+  }
 
-    var dados = {
-      acao:                    'salvarVisita',
+  // ─── Carregar lista ─────────────────────────────────────────
+  function carregarLista(){
+    var tbody=document.querySelector('#tabelaVisitas tbody');
+    tbody.innerHTML='<tr><td colspan="6">Carregando...</td></tr>';
+    fetch(API_URL,{method:'POST',body:JSON.stringify({acao:'listarVisitas'})})
+      .then(function(r){return r.json();})
+      .then(function(resp){
+        if(!resp.sucesso){
+          tbody.innerHTML='<tr><td colspan="6">Erro: '+resp.mensagem+'</td></tr>';
+          return;
+        }
+        listaGlobal=resp.visitas||[];
+        renderTabela(listaGlobal);
+      })
+      .catch(function(err){
+        tbody.innerHTML='<tr><td colspan="6">Erro: '+err.message+'</td></tr>';
+      });
+  }
+
+  function renderTabela(lista){
+    var tbody=document.querySelector('#tabelaVisitas tbody');
+    tbody.innerHTML='';
+    if(lista.length===0){
+      tbody.innerHTML='<tr><td colspan="6">Nenhuma visita registrada.</td></tr>';
+      return;
+    }
+    lista.forEach(function(vis){
+      var tr=document.createElement('tr');
+      tr.innerHTML=
+        '<td>'+vis.id+'</td>'+
+        '<td>'+vis.estabelecimento+'</td>'+
+        '<td><span class="badge badge-data">'+(vis.dataVisita||'-')+'</span></td>'+
+        '<td>'+(vis.responsavel||'-')+'</td>'+
+        '<td><span class="badge badge-status">'+(vis.viabilidade||'-')+'</span></td>'+
+        '<td>'+(vis.totalPontos||'0')+'</td>';
+      tr.addEventListener('click',function(){
+        editarVisita(vis.linha, vis.id, vis.estabelecimento, vis.dataVisita);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById('filtroEstabelecimento').addEventListener('input',aplicarFiltros);
+  document.getElementById('filtroResponsavel').addEventListener('input',aplicarFiltros);
+
+  function aplicarFiltros(){
+    var est=document.getElementById('filtroEstabelecimento').value.toLowerCase();
+    var resp=document.getElementById('filtroResponsavel').value.toLowerCase();
+    var filtrada=listaGlobal.filter(function(v){
+      var okEst=!est||(v.estabelecimento||'').toLowerCase().indexOf(est)!==-1;
+      var okResp=!resp||(v.responsavel||'').toLowerCase().indexOf(resp)!==-1;
+      return okEst && okResp;
+    });
+    renderTabela(filtrada);
+  }
+
+  // ─── Editar ─────────────────────────────────────────────────
+  function editarVisita(linha, id, estabelecimento, dataVisita){
+    fetch(API_URL,{method:'POST',body:JSON.stringify({acao:'buscarVisita',linha:linha})})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(!d.sucesso){alert('Erro: '+d.mensagem);return;}
+
+        linhaEmEdicao=linha;
+        idEmEdicao=id;
+
+        document.getElementById('infoEdicao').style.display='block';
+        document.getElementById('infoEdicaoDesc').textContent=estabelecimento+' — '+dataVisita;
+        document.getElementById('infoEdicaoId').textContent=id;
+        document.getElementById('btnSubmit').innerHTML='💾 Salvar Alterações';
+
+        // Limpa pontos anteriores
+        document.getElementById('listaPontos').innerHTML='';
+        contadorPontos=0;
+
+        // Preenche campos
+        setSelect('estabelecimento', d['Estabelecimento']);
+        document.getElementById('dataVisita').value        = d['Data Visita']       ||'';
+        document.getElementById('responsavelVisita').value = d['Responsável Visita'] ||'';
+        document.getElementById('contatoLocal').value      = d['Contato Local']      ||'';
+
+        var internet=d['Internet Local']||'';
+        setSelect('internetLocal', internet);
+        document.getElementById('camposWifi').style.display=
+          internet==='Sim'?'block':'none';
+
+        setSelect('tipoConexao',   d['Tipo Conexão']);
+        setSelect('qualidadeWifi', d['Qualidade WiFi']);
+        document.getElementById('senhaWifi').value         = d['Senha WiFi']         ||'';
+        setSelect('tensaoEletrica',   d['Tensão Elétrica']);
+        setSelect('tomadasProximas',  d['Tomadas Próximas']);
+        setSelect('extensaoNecessaria',d['Extensão Necessária']);
+        document.getElementById('obsInfraestrutura').value = d['Obs Infraestrutura'] ||'';
+        document.getElementById('totalPontos').value       = d['Total Pontos']       ||'';
+        setSelect('viabilidadeGeral', d['Viabilidade']);
+        document.getElementById('desafios').value          = d['Desafios']           ||'';
+        document.getElementById('equipamentosNecessarios').value = d['Equipamentos'] ||'';
+        document.getElementById('dataInstalacao').value    = d['Data Instalação']    ||'';
+        setSelect('apoioExterno',  d['Apoio Externo']);
+        document.getElementById('observacoesFinais').value = d['Observações Finais'] ||'';
+
+        // Reconstrói pontos
+        var pontosJSON=d['Pontos JSON']||'[]';
+        var pontos=[];
+        try{ pontos=JSON.parse(pontosJSON); }catch(e){ pontos=[]; }
+        pontos.forEach(function(p){ adicionarPonto(p); });
+
+        trocarTab('tab-nova');
+        window.scrollTo(0,0);
+      })
+      .catch(function(err){alert('Erro: '+err.message);});
+  }
+
+  // ─── Submit ─────────────────────────────────────────────────
+  document.getElementById('formVisita').addEventListener('submit',function(e){
+    e.preventDefault();
+    var btn=document.getElementById('btnSubmit');
+    var alerta=document.getElementById('alerta');
+    alerta.style.display='none';
+    btn.disabled=true;
+    btn.innerHTML='<span class="loading"></span> Salvando...';
+
+    var dados={
+      acao:                    linhaEmEdicao?'atualizarVisita':'salvarVisita',
+      linha:                   linhaEmEdicao,
       estabelecimento:         document.getElementById('estabelecimento').value,
       dataVisita:              document.getElementById('dataVisita').value,
       responsavelVisita:       document.getElementById('responsavelVisita').value,
@@ -277,7 +653,6 @@
       totalPontos:             document.getElementById('totalPontos').value,
       viabilidadeGeral:        document.getElementById('viabilidadeGeral').value,
       desafios:                document.getElementById('desafios').value,
-      materiaisNecessarios:    document.getElementById('materiaisNecessarios').value,
       equipamentosNecessarios: document.getElementById('equipamentosNecessarios').value,
       dataInstalacao:          document.getElementById('dataInstalacao').value,
       apoioExterno:            document.getElementById('apoioExterno').value,
@@ -285,33 +660,33 @@
       pontos:                  coletarPontos()
     };
 
-    fetch(API_URL, { method: 'POST', body: JSON.stringify(dados) })
-      .then(function(r) { return r.json(); })
-      .then(function(resultado) {
-        if (resultado.sucesso) {
-          alerta.className = 'alerta sucesso';
-          alerta.innerHTML = '✅ ' + resultado.mensagem + ' | ID: ' + resultado.id;
-          document.getElementById('formVisita').reset();
-          document.getElementById('listaPontos').innerHTML = '';
-          document.getElementById('camposWifi').style.display = 'none';
-          contadorPontos = 0;
-        } else {
-          alerta.className = 'alerta erro';
-          alerta.innerHTML = '❌ ' + resultado.mensagem;
+    fetch(API_URL,{method:'POST',body:JSON.stringify(dados)})
+      .then(function(r){return r.json();})
+      .then(function(resultado){
+        if(resultado.sucesso){
+          alerta.className='alerta sucesso';
+          alerta.innerHTML='✅ '+resultado.mensagem+(resultado.id?' | ID: '+resultado.id:'');
+          cancelarEdicao();
+          carregarLista();
+        }else{
+          alerta.className='alerta erro';
+          alerta.innerHTML='❌ '+resultado.mensagem;
         }
-        alerta.style.display = 'block';
-        window.scrollTo(0, 0);
-        btn.disabled = false;
-        btn.innerHTML = '💾 Salvar Visita Técnica';
+        alerta.style.display='block';
+        window.scrollTo(0,0);
+        btn.disabled=false;
+        btn.innerHTML='💾 Salvar Visita Técnica';
       })
-      .catch(function(err) {
-        alerta.className = 'alerta erro';
-        alerta.innerHTML = '❌ Erro de conexão: ' + err.message;
-        alerta.style.display = 'block';
-        btn.disabled = false;
-        btn.innerHTML = '💾 Salvar Visita Técnica';
+      .catch(function(err){
+        alerta.className='alerta erro';
+        alerta.innerHTML='❌ Erro de conexão: '+err.message;
+        alerta.style.display='block';
+        btn.disabled=false;
+        btn.innerHTML='💾 Salvar Visita Técnica';
       });
   });
+
+  carregarLista();
 </script>
 </body>
 </html>
