@@ -27,11 +27,10 @@
 
     .secao-ponto { border:1px solid #ddd; border-radius:8px; padding:16px; margin-bottom:16px; background:#fafafa; position:relative; }
     .secao-ponto h3 { margin:0 0 12px 0; font-size:15px; color:#1a73e8; }
-    .btn-remove { position:absolute; top:12px; right:12px; background:#fff; color:#e53935; border:1px solid #e53935; padding:3px 10px; border-radius:4px; cursor:pointer; font-size:12px; }
+    .btn-remove-ponto { position:absolute; top:12px; right:12px; background:#fff; color:#e53935; border:1px solid #e53935; padding:3px 10px; border-radius:4px; cursor:pointer; font-size:12px; }
     .btn-add-ponto { background:#1a73e8; color:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-size:14px; margin-top:8px; width:100%; }
     .btn-add-ponto:hover { background:#1557b0; }
 
-    /* Materiais */
     .materiais-lista { margin-top:8px; }
     .material-item { display:flex; gap:8px; align-items:center; margin-bottom:6px; }
     .material-item input[type="text"] { flex:3; }
@@ -39,7 +38,6 @@
     .btn-remove-material { background:#fff; color:#e53935; border:1px solid #e53935; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:12px; white-space:nowrap; }
     .btn-add-material { background:#fff; color:#1a73e8; border:1px solid #1a73e8; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px; margin-top:4px; }
 
-    /* Fotos */
     .fotos-preview { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
     .foto-thumb { position:relative; width:80px; height:80px; }
     .foto-thumb img { width:80px; height:80px; object-fit:cover; border-radius:6px; border:1px solid #ddd; }
@@ -201,7 +199,7 @@
             <input type="number" id="totalPontos" required min="0">
           </div>
           <div class="form-group">
-            <label>Viabilidade Técnica <span class="obrigatorio">*</span></label>
+            <label>Viabilidade Geral <span class="obrigatorio">*</span></label>
             <select id="viabilidadeGeral" required>
               <option value="">Selecione...</option>
               <option>Totalmente viável</option>
@@ -216,12 +214,12 @@
           <textarea id="desafios"></textarea>
         </div>
         <div class="form-group">
-          <label>Equipamentos a Separar/Comprar <span class="obrigatorio">*</span></label>
+          <label>Equipamentos Necessários <span class="obrigatorio">*</span></label>
           <textarea id="equipamentosNecessarios" required></textarea>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Data Sugerida para Instalação</label>
+            <label>Data Sugerida Instalação</label>
             <input type="date" id="dataInstalacao">
           </div>
           <div class="form-group">
@@ -320,7 +318,8 @@
       sel.innerHTML='<option value="">Selecione...</option>';
       (lista||[]).forEach(function(est){
         var o=document.createElement('option');
-        o.value=est.nome; o.textContent=est.nome;
+        o.value=est.nome;
+        o.textContent=est.nome;
         sel.appendChild(o);
       });
     });
@@ -333,77 +332,68 @@
     div.className='secao-ponto';
     div.id='ponto-'+id;
 
+    var locais=['Entrada','Recepção','Caixa / Checkout','Balcão','Salão / Área principal','Sala de espera','Corredor','Outro'];
+    var tiposEquip=['TV nova (instalada por nós)','TV existente do estabelecimento','Totem LED','Outro'];
+    var tamanhos=['32"','43"','50"','55"','65"','A definir'];
+    var orientacoes=['Paisagem (horizontal)','Retrato (vertical)','A definir'];
+
+    function optionsHtml(lista, valorAtual){
+      return '<option value="">Selecione...</option>'+
+        lista.map(function(o){
+          return '<option'+(valorAtual===o?' selected':'')+'>'+o+'</option>';
+        }).join('');
+    }
+
     div.innerHTML=
       '<h3>📍 Ponto '+id+'</h3>'+
-      '<button type="button" class="btn-remove" onclick="document.getElementById(\'ponto-'+id+'\').remove()">✕ Remover</button>'+
+      '<button type="button" class="btn-remove-ponto" onclick="document.getElementById(\'ponto-'+id+'\').remove()">✕ Remover</button>'+
 
-      '<div class="form-group"><label>Identificação</label>'+
+      '<div class="form-group"><label>Identificação do Ponto</label>'+
       '<input type="text" class="ponto-campo" data-campo="identificacao" placeholder="Ex.: Entrada principal" value="'+(dados&&dados.identificacao?dados.identificacao:'')+'"></div>'+
 
       '<div class="form-row">'+
         '<div class="form-group"><label>Local no Ambiente</label>'+
-        '<select class="ponto-campo" data-campo="local">'+
-          '<option value="">Selecione...</option>'+
-          ['Entrada','Recepção','Caixa / Checkout','Balcão','Salão / Área principal','Sala de espera','Corredor','Outro']
-          .map(function(o){return '<option'+(dados&&dados.local===o?' selected':'')+'>'+o+'</option>';}).join('')+
-        '</select></div>'+
+        '<select class="ponto-campo" data-campo="local">'+optionsHtml(locais,dados&&dados.local)+'</select></div>'+
         '<div class="form-group"><label>Tipo de Equipamento</label>'+
-        '<select class="ponto-campo" data-campo="tipoEquipamento">'+
-          '<option value="">Selecione...</option>'+
-          ['TV nova (instalada por nós)','TV existente do estabelecimento','Totem LED','Outro']
-          .map(function(o){return '<option'+(dados&&dados.tipoEquipamento===o?' selected':'')+'>'+o+'</option>';}).join('')+
-        '</select></div>'+
+        '<select class="ponto-campo" data-campo="tipoEquipamento">'+optionsHtml(tiposEquip,dados&&dados.tipoEquipamento)+'</select></div>'+
       '</div>'+
 
       '<div class="form-row">'+
         '<div class="form-group"><label>Tamanho Sugerido</label>'+
-        '<select class="ponto-campo" data-campo="tamanho">'+
-          '<option value="">Selecione...</option>'+
-          ['32"','43"','50"','55"','65"','A definir']
-          .map(function(o){return '<option'+(dados&&dados.tamanho===o?' selected':'')+'>'+o+'</option>';}).join('')+
-        '</select></div>'+
+        '<select class="ponto-campo" data-campo="tamanho">'+optionsHtml(tamanhos,dados&&dados.tamanho)+'</select></div>'+
         '<div class="form-group"><label>Orientação da Tela</label>'+
-        '<select class="ponto-campo" data-campo="orientacao">'+
-          '<option value="">Selecione...</option>'+
-          ['Paisagem (horizontal)','Retrato (vertical)','A definir']
-          .map(function(o){return '<option'+(dados&&dados.orientacao===o?' selected':'')+'>'+o+'</option>';}).join('')+
-        '</select></div>'+
+        '<select class="ponto-campo" data-campo="orientacao">'+optionsHtml(orientacoes,dados&&dados.orientacao)+'</select></div>'+
       '</div>'+
 
       '<div class="form-group"><label>Observações do Ponto</label>'+
       '<textarea class="ponto-campo" data-campo="observacoes">'+(dados&&dados.observacoes?dados.observacoes:'')+'</textarea></div>'+
 
-      // Materiais
       '<div class="form-group">'+
         '<label>🔩 Materiais Necessários</label>'+
         '<div class="materiais-lista" id="materiais-'+id+'"></div>'+
         '<button type="button" class="btn-add-material" onclick="adicionarMaterial('+id+')">+ Adicionar Material</button>'+
       '</div>'+
 
-      // Fotos
       '<div class="form-group">'+
         '<label>📷 Fotos do Ponto</label>'+
         '<div class="fotos-preview" id="fotos-preview-'+id+'"></div>'+
         '<div class="upload-status" id="upload-status-'+id+'"></div>'+
-        '<label class="upload-btn-label">'+
-          '📎 Selecionar Foto'+
-          '<input type="file" accept="image/*" multiple onchange="processarFotos(this, '+id+')">'+
+        '<label class="upload-btn-label">📎 Selecionar Foto'+
+          '<input type="file" accept="image/*" multiple onchange="processarFotos(this,'+id+')">'+
         '</label>'+
       '</div>';
 
     document.getElementById('listaPontos').appendChild(div);
 
-    // Se veio com dados de materiais, preenche
-    if(dados && dados.materiais && dados.materiais.length>0){
+    if(dados&&dados.materiais&&dados.materiais.length>0){
       dados.materiais.forEach(function(m){
-        adicionarMaterial(id, m.nome, m.quantidade);
+        adicionarMaterial(id,m.nome,m.quantidade);
       });
     }
 
-    // Se veio com fotos já salvas, mostra thumbs
-    if(dados && dados.fotos && dados.fotos.length>0){
+    if(dados&&dados.fotos&&dados.fotos.length>0){
       dados.fotos.forEach(function(url){
-        adicionarThumbExistente(id, url);
+        adicionarThumbExistente(id,url);
       });
     }
   }
@@ -452,9 +442,7 @@
           })
           .then(function(r){return r.json();})
           .then(function(resp){
-            if(resp.sucesso){
-              adicionarThumbExistente(pontoId, resp.url);
-            }
+            if(resp.sucesso) adicionarThumbExistente(pontoId,resp.url);
             resolve(resp.sucesso);
           })
           .catch(function(){resolve(false);});
@@ -466,227 +454,5 @@
     Promise.all(promessas).then(function(resultados){
       var ok=resultados.filter(Boolean).length;
       status.textContent=ok+' de '+files.length+' foto(s) enviada(s) com sucesso.';
-      input.value='';
-    });
-  }
+      input
 
-  function coletarPontos(){
-    var pontos=[];
-    document.querySelectorAll('.secao-ponto').forEach(function(secao){
-      var ponto={};
-      secao.querySelectorAll('.ponto-campo').forEach(function(campo){
-        ponto[campo.dataset.campo]=campo.value||'';
-      });
-
-      // Materiais
-      var materiais=[];
-      secao.querySelectorAll('.material-item').forEach(function(item){
-        var nome=(item.querySelector('.mat-nome').value||'').trim();
-        var qtd =parseInt(item.querySelector('.mat-qtd').value)||1;
-        if(nome) materiais.push({nome:nome, quantidade:qtd});
-      });
-      ponto.materiais=materiais;
-
-      // Fotos (URLs já upadas)
-      var fotos=[];
-      secao.querySelectorAll('.foto-thumb').forEach(function(thumb){
-        if(thumb.dataset.url) fotos.push(thumb.dataset.url);
-      });
-      ponto.fotos=fotos;
-
-      pontos.push(ponto);
-    });
-    return pontos;
-  }
-
-  // ─── Cancelar edição ────────────────────────────────────────
-  function cancelarEdicao(){
-    linhaEmEdicao=null;
-    idEmEdicao=null;
-    document.getElementById('infoEdicao').style.display='none';
-    document.getElementById('formVisita').reset();
-    document.getElementById('listaPontos').innerHTML='';
-    document.getElementById('camposWifi').style.display='none';
-    contadorPontos=0;
-    document.getElementById('dataVisita').value=
-      new Date().toISOString().split('T')[0];
-    document.getElementById('btnSubmit').innerHTML='💾 Salvar Visita Técnica';
-  }
-
-  // ─── Carregar lista ─────────────────────────────────────────
-  function carregarLista(){
-    var tbody=document.querySelector('#tabelaVisitas tbody');
-    tbody.innerHTML='<tr><td colspan="6">Carregando...</td></tr>';
-    fetch(API_URL,{method:'POST',body:JSON.stringify({acao:'listarVisitas'})})
-      .then(function(r){return r.json();})
-      .then(function(resp){
-        if(!resp.sucesso){
-          tbody.innerHTML='<tr><td colspan="6">Erro: '+resp.mensagem+'</td></tr>';
-          return;
-        }
-        listaGlobal=resp.visitas||[];
-        renderTabela(listaGlobal);
-      })
-      .catch(function(err){
-        tbody.innerHTML='<tr><td colspan="6">Erro: '+err.message+'</td></tr>';
-      });
-  }
-
-  function renderTabela(lista){
-    var tbody=document.querySelector('#tabelaVisitas tbody');
-    tbody.innerHTML='';
-    if(lista.length===0){
-      tbody.innerHTML='<tr><td colspan="6">Nenhuma visita registrada.</td></tr>';
-      return;
-    }
-    lista.forEach(function(vis){
-      var tr=document.createElement('tr');
-      tr.innerHTML=
-        '<td>'+vis.id+'</td>'+
-        '<td>'+vis.estabelecimento+'</td>'+
-        '<td><span class="badge badge-data">'+(vis.dataVisita||'-')+'</span></td>'+
-        '<td>'+(vis.responsavel||'-')+'</td>'+
-        '<td><span class="badge badge-status">'+(vis.viabilidade||'-')+'</span></td>'+
-        '<td>'+(vis.totalPontos||'0')+'</td>';
-      tr.addEventListener('click',function(){
-        editarVisita(vis.linha, vis.id, vis.estabelecimento, vis.dataVisita);
-      });
-      tbody.appendChild(tr);
-    });
-  }
-
-  document.getElementById('filtroEstabelecimento').addEventListener('input',aplicarFiltros);
-  document.getElementById('filtroResponsavel').addEventListener('input',aplicarFiltros);
-
-  function aplicarFiltros(){
-    var est=document.getElementById('filtroEstabelecimento').value.toLowerCase();
-    var resp=document.getElementById('filtroResponsavel').value.toLowerCase();
-    var filtrada=listaGlobal.filter(function(v){
-      var okEst=!est||(v.estabelecimento||'').toLowerCase().indexOf(est)!==-1;
-      var okResp=!resp||(v.responsavel||'').toLowerCase().indexOf(resp)!==-1;
-      return okEst && okResp;
-    });
-    renderTabela(filtrada);
-  }
-
-  // ─── Editar ─────────────────────────────────────────────────
-  function editarVisita(linha, id, estabelecimento, dataVisita){
-    fetch(API_URL,{method:'POST',body:JSON.stringify({acao:'buscarVisita',linha:linha})})
-      .then(function(r){return r.json();})
-      .then(function(d){
-        if(!d.sucesso){alert('Erro: '+d.mensagem);return;}
-
-        linhaEmEdicao=linha;
-        idEmEdicao=id;
-
-        document.getElementById('infoEdicao').style.display='block';
-        document.getElementById('infoEdicaoDesc').textContent=estabelecimento+' — '+dataVisita;
-        document.getElementById('infoEdicaoId').textContent=id;
-        document.getElementById('btnSubmit').innerHTML='💾 Salvar Alterações';
-
-        // Limpa pontos anteriores
-        document.getElementById('listaPontos').innerHTML='';
-        contadorPontos=0;
-
-        // Preenche campos
-        setSelect('estabelecimento', d['Estabelecimento']);
-        document.getElementById('dataVisita').value        = d['Data Visita']       ||'';
-        document.getElementById('responsavelVisita').value = d['Responsável Visita'] ||'';
-        document.getElementById('contatoLocal').value      = d['Contato Local']      ||'';
-
-        var internet=d['Internet Local']||'';
-        setSelect('internetLocal', internet);
-        document.getElementById('camposWifi').style.display=
-          internet==='Sim'?'block':'none';
-
-        setSelect('tipoConexao',   d['Tipo Conexão']);
-        setSelect('qualidadeWifi', d['Qualidade WiFi']);
-        document.getElementById('senhaWifi').value         = d['Senha WiFi']         ||'';
-        setSelect('tensaoEletrica',   d['Tensão Elétrica']);
-        setSelect('tomadasProximas',  d['Tomadas Próximas']);
-        setSelect('extensaoNecessaria',d['Extensão Necessária']);
-        document.getElementById('obsInfraestrutura').value = d['Obs Infraestrutura'] ||'';
-        document.getElementById('totalPontos').value       = d['Total Pontos']       ||'';
-        setSelect('viabilidadeGeral', d['Viabilidade']);
-        document.getElementById('desafios').value          = d['Desafios']           ||'';
-        document.getElementById('equipamentosNecessarios').value = d['Equipamentos'] ||'';
-        document.getElementById('dataInstalacao').value    = d['Data Instalação']    ||'';
-        setSelect('apoioExterno',  d['Apoio Externo']);
-        document.getElementById('observacoesFinais').value = d['Observações Finais'] ||'';
-
-        // Reconstrói pontos
-        var pontosJSON=d['Pontos JSON']||'[]';
-        var pontos=[];
-        try{ pontos=JSON.parse(pontosJSON); }catch(e){ pontos=[]; }
-        pontos.forEach(function(p){ adicionarPonto(p); });
-
-        trocarTab('tab-nova');
-        window.scrollTo(0,0);
-      })
-      .catch(function(err){alert('Erro: '+err.message);});
-  }
-
-  // ─── Submit ─────────────────────────────────────────────────
-  document.getElementById('formVisita').addEventListener('submit',function(e){
-    e.preventDefault();
-    var btn=document.getElementById('btnSubmit');
-    var alerta=document.getElementById('alerta');
-    alerta.style.display='none';
-    btn.disabled=true;
-    btn.innerHTML='<span class="loading"></span> Salvando...';
-
-    var dados={
-      acao:                    linhaEmEdicao?'atualizarVisita':'salvarVisita',
-      linha:                   linhaEmEdicao,
-      estabelecimento:         document.getElementById('estabelecimento').value,
-      dataVisita:              document.getElementById('dataVisita').value,
-      responsavelVisita:       document.getElementById('responsavelVisita').value,
-      contatoLocal:            document.getElementById('contatoLocal').value,
-      internetLocal:           document.getElementById('internetLocal').value,
-      tipoConexao:             document.getElementById('tipoConexao').value,
-      qualidadeWifi:           document.getElementById('qualidadeWifi').value,
-      senhaWifi:               document.getElementById('senhaWifi').value,
-      tensaoEletrica:          document.getElementById('tensaoEletrica').value,
-      tomadasProximas:         document.getElementById('tomadasProximas').value,
-      extensaoNecessaria:      document.getElementById('extensaoNecessaria').value,
-      obsInfraestrutura:       document.getElementById('obsInfraestrutura').value,
-      totalPontos:             document.getElementById('totalPontos').value,
-      viabilidadeGeral:        document.getElementById('viabilidadeGeral').value,
-      desafios:                document.getElementById('desafios').value,
-      equipamentosNecessarios: document.getElementById('equipamentosNecessarios').value,
-      dataInstalacao:          document.getElementById('dataInstalacao').value,
-      apoioExterno:            document.getElementById('apoioExterno').value,
-      observacoesFinais:       document.getElementById('observacoesFinais').value,
-      pontos:                  coletarPontos()
-    };
-
-    fetch(API_URL,{method:'POST',body:JSON.stringify(dados)})
-      .then(function(r){return r.json();})
-      .then(function(resultado){
-        if(resultado.sucesso){
-          alerta.className='alerta sucesso';
-          alerta.innerHTML='✅ '+resultado.mensagem+(resultado.id?' | ID: '+resultado.id:'');
-          cancelarEdicao();
-          carregarLista();
-        }else{
-          alerta.className='alerta erro';
-          alerta.innerHTML='❌ '+resultado.mensagem;
-        }
-        alerta.style.display='block';
-        window.scrollTo(0,0);
-        btn.disabled=false;
-        btn.innerHTML='💾 Salvar Visita Técnica';
-      })
-      .catch(function(err){
-        alerta.className='alerta erro';
-        alerta.innerHTML='❌ Erro de conexão: '+err.message;
-        alerta.style.display='block';
-        btn.disabled=false;
-        btn.innerHTML='💾 Salvar Visita Técnica';
-      });
-  });
-
-  carregarLista();
-</script>
-</body>
-</html>
