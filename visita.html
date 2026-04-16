@@ -39,15 +39,37 @@
     .btn-add-material { background:#fff; color:#1a73e8; border:1px solid #1a73e8; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px; margin-top:4px; }
 
     .fotos-preview { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
-    .foto-thumb { position:relative; width:80px; height:80px; }
-    .foto-thumb img { width:80px; height:80px; object-fit:cover; border-radius:6px; border:1px solid #ddd; }
+    .foto-thumb { position:relative; width:100px; height:100px; }
+    .foto-thumb img { width:100px; height:100px; object-fit:cover; border-radius:6px; border:1px solid #ddd; cursor:pointer; }
+    .foto-thumb img:hover { opacity:0.85; }
     .foto-thumb .btn-remove-foto { position:absolute; top:-6px; right:-6px; background:#e53935; color:#fff; border:none; border-radius:50%; width:20px; height:20px; font-size:12px; cursor:pointer; line-height:20px; text-align:center; padding:0; }
     .upload-status { font-size:12px; color:#888; margin-top:4px; }
     .upload-btn-label { display:inline-block; background:#fff; color:#1a73e8; border:1px solid #1a73e8; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px; margin-top:4px; }
     .upload-btn-label input[type="file"] { display:none; }
+
+    /* Lightbox */
+    #lightbox { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center; flex-direction:column; }
+    #lightbox.aberto { display:flex; }
+    #lightbox img { max-width:90%; max-height:80vh; border-radius:8px; box-shadow:0 4px 32px rgba(0,0,0,0.5); }
+    #lightbox-fechar { position:absolute; top:20px; right:28px; color:#fff; font-size:32px; cursor:pointer; font-weight:bold; line-height:1; }
+    #lightbox-legenda { color:#fff; margin-top:12px; font-size:13px; }
+    #lightbox-nav { display:flex; gap:24px; margin-top:16px; }
+    #lightbox-nav button { background:rgba(255,255,255,0.15); color:#fff; border:1px solid rgba(255,255,255,0.3); padding:6px 18px; border-radius:6px; cursor:pointer; font-size:18px; }
+    #lightbox-nav button:hover { background:rgba(255,255,255,0.3); }
   </style>
 </head>
 <body>
+
+<!-- Lightbox -->
+<div id="lightbox">
+  <span id="lightbox-fechar" onclick="fecharLightbox()">✕</span>
+  <img id="lightbox-img" src="" alt="Foto ampliada">
+  <div id="lightbox-legenda"></div>
+  <div id="lightbox-nav">
+    <button onclick="lightboxAnterior()">&#8592; Anterior</button>
+    <button onclick="lightboxProximo()">Próxima &#8594;</button>
+  </div>
+</div>
 
 <div class="header">
   <button class="back-btn" onclick="location.href='index.html'">← Voltar</button>
@@ -284,13 +306,56 @@
   var listaGlobal    = [];
   var contadorPontos = 0;
 
+  // Lightbox
+  var lightboxFotos  = [];
+  var lightboxIndice = 0;
+
+  function abrirLightbox(urls, indice){
+    lightboxFotos  = urls;
+    lightboxIndice = indice;
+    document.getElementById('lightbox-img').src = urls[indice];
+    document.getElementById('lightbox-legenda').textContent =
+      (indice+1) + ' / ' + urls.length;
+    document.getElementById('lightbox').classList.add('aberto');
+  }
+
+  function fecharLightbox(){
+    document.getElementById('lightbox').classList.remove('aberto');
+    document.getElementById('lightbox-img').src='';
+  }
+
+  function lightboxProximo(){
+    lightboxIndice = (lightboxIndice+1) % lightboxFotos.length;
+    document.getElementById('lightbox-img').src = lightboxFotos[lightboxIndice];
+    document.getElementById('lightbox-legenda').textContent =
+      (lightboxIndice+1) + ' / ' + lightboxFotos.length;
+  }
+
+  function lightboxAnterior(){
+    lightboxIndice = (lightboxIndice - 1 + lightboxFotos.length) % lightboxFotos.length;
+    document.getElementById('lightbox-img').src = lightboxFotos[lightboxIndice];
+    document.getElementById('lightbox-legenda').textContent =
+      (lightboxIndice+1) + ' / ' + lightboxFotos.length;
+  }
+
+  // Fecha lightbox clicando fora da imagem
+  document.getElementById('lightbox').addEventListener('click', function(e){
+    if(e.target === this) fecharLightbox();
+  });
+
+  // Fecha lightbox com ESC
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape') fecharLightbox();
+    if(e.key==='ArrowRight') lightboxProximo();
+    if(e.key==='ArrowLeft')  lightboxAnterior();
+  });
+
   document.getElementById('dataVisita').value =
     new Date().toISOString().split('T')[0];
 
   // ─── Abas ───────────────────────────────────────────────────
   document.querySelectorAll('.tab-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
-      console.log('Clique na aba:', this.dataset.tab);
       trocarTab(this.dataset.tab);
     });
   });
@@ -386,19 +451,22 @@
 
     document.getElementById('listaPontos').appendChild(div);
 
-    if(dados&&dados.materiais&&dados.materiais.length>0){
+    // Preenche materiais vindos do JSON
+    if(dados && dados.materiais && dados.materiais.length>0){
       dados.materiais.forEach(function(m){
-        adicionarMaterial(id,m.nome,m.quantidade);
+        adicionarMaterial(id, m.nome, m.quantidade);
       });
     }
-    if(dados&&dados.fotos&&dados.fotos.length>0){
-      dados.fotos.forEach(function(url){
-        adicionarThumbExistente(id,url);
+
+    // Preenche fotos vindas do JSON — aqui está a correção principal
+    if(dados && dados.fotos && dados.fotos.length>0){
+      dados.fotos.forEach(function(url, idx){
+        adicionarThumbExistente(id, url, dados.fotos, idx);
       });
     }
   }
 
-  function adicionarMaterial(pontoId,nome,qtd){
+  function adicionarMaterial(pontoId, nome, qtd){
     var lista=document.getElementById('materiais-'+pontoId);
     var div=document.createElement('div');
     div.className='material-item';
@@ -409,22 +477,49 @@
     lista.appendChild(div);
   }
 
-  function adicionarThumbExistente(pontoId,url){
+  function adicionarThumbExistente(pontoId, url, todasUrls, indice){
     var preview=document.getElementById('fotos-preview-'+pontoId);
+
+    // Monta lista de todas as URLs do preview atual para o lightbox
     var div=document.createElement('div');
     div.className='foto-thumb';
     div.dataset.url=url;
-    div.innerHTML=
-      '<img src="'+url+'" alt="Foto">'+
-      '<button type="button" class="btn-remove-foto" onclick="this.parentElement.remove()">✕</button>';
+
+    var img=document.createElement('img');
+    img.src=url;
+    img.alt='Foto '+(indice!==undefined?indice+1:'');
+    img.title='Clique para ampliar';
+
+    // Ao clicar na thumb, abre o lightbox com todas as fotos do ponto
+    img.addEventListener('click', function(){
+      // Coleta todas as URLs das thumbs do mesmo preview (inclui recém-upadas)
+      var urls=[];
+      preview.querySelectorAll('.foto-thumb').forEach(function(t){
+        if(t.dataset.url) urls.push(t.dataset.url);
+      });
+      var idx=urls.indexOf(url);
+      abrirLightbox(urls, idx>=0?idx:0);
+    });
+
+    var btnRemover=document.createElement('button');
+    btnRemover.type='button';
+    btnRemover.className='btn-remove-foto';
+    btnRemover.textContent='✕';
+    btnRemover.addEventListener('click', function(){
+      div.remove();
+    });
+
+    div.appendChild(img);
+    div.appendChild(btnRemover);
     preview.appendChild(div);
   }
 
-  function processarFotos(input,pontoId){
+  function processarFotos(input, pontoId){
     var files=Array.from(input.files);
     if(!files.length) return;
     var status=document.getElementById('upload-status-'+pontoId);
     status.textContent='Enviando '+files.length+' foto(s)...';
+
     var promessas=files.map(function(file){
       return new Promise(function(resolve){
         var reader=new FileReader();
@@ -438,7 +533,9 @@
           })})
           .then(function(r){return r.json();})
           .then(function(resp){
-            if(resp.sucesso) adicionarThumbExistente(pontoId,resp.url);
+            if(resp.sucesso){
+              adicionarThumbExistente(pontoId, resp.url);
+            }
             resolve(resp.sucesso);
           })
           .catch(function(){resolve(false);});
@@ -446,6 +543,7 @@
         reader.readAsDataURL(file);
       });
     });
+
     Promise.all(promessas).then(function(resultados){
       var ok=resultados.filter(Boolean).length;
       status.textContent=ok+' de '+files.length+' foto(s) enviada(s).';
@@ -565,33 +663,34 @@
         document.getElementById('listaPontos').innerHTML='';
         contadorPontos=0;
 
-        setSelect('estabelecimento',      d['Estabelecimento']);
+        setSelect('estabelecimento',       d['Estabelecimento']);
         document.getElementById('dataVisita').value        = d['Data Visita']              ||'';
         document.getElementById('responsavelVisita').value = d['Responsável Visita']       ||'';
         document.getElementById('contatoLocal').value      = d['Contato no Local']         ||'';
 
         var internet=d['Internet Local']||'';
-        setSelect('internetLocal',internet);
+        setSelect('internetLocal', internet);
         document.getElementById('camposWifi').style.display=internet==='Sim'?'block':'none';
 
-        setSelect('tipoConexao',          d['Tipo Conexão']);
-        setSelect('qualidadeWifi',        d['Qualidade WiFi']);
+        setSelect('tipoConexao',           d['Tipo Conexão']);
+        setSelect('qualidadeWifi',         d['Qualidade WiFi']);
         document.getElementById('senhaWifi').value         = d['Senha WiFi']               ||'';
-        setSelect('tensaoEletrica',       d['Tensão Elétrica']);
-        setSelect('tomadasProximas',      d['Tomadas Próximas']);
-        setSelect('extensaoNecessaria',   d['Extensão Necessária']);
+        setSelect('tensaoEletrica',        d['Tensão Elétrica']);
+        setSelect('tomadasProximas',       d['Tomadas Próximas']);
+        setSelect('extensaoNecessaria',    d['Extensão Necessária']);
         document.getElementById('obsInfraestrutura').value = d['Obs Infraestrutura']       ||'';
         document.getElementById('totalPontos').value       = d['Total Pontos']             ||'';
-        setSelect('viabilidadeGeral',     d['Viabilidade Geral']);
+        setSelect('viabilidadeGeral',      d['Viabilidade Geral']);
         document.getElementById('desafios').value          = d['Desafios']                 ||'';
         document.getElementById('equipamentosNecessarios').value = d['Equipamentos Necessários'] ||'';
         document.getElementById('dataInstalacao').value    = d['Data Sugerida Instalação'] ||'';
-        setSelect('apoioExterno',         d['Apoio Externo']);
+        setSelect('apoioExterno',          d['Apoio Externo']);
         document.getElementById('observacoesFinais').value = d['Observações Finais']       ||'';
 
-        var pontosJSON=d['Pontos Detalhados (JSON)']||'[]';
-        var pontos=[];
-        try{ pontos=JSON.parse(pontosJSON); }catch(e){ pontos=[]; }
+        // Reconstrói pontos com materiais e fotos
+        var pontosJSON = d['Pontos Detalhados (JSON)'] || '[]';
+        var pontos = [];
+        try { pontos = JSON.parse(pontosJSON); } catch(e) { pontos = []; }
         pontos.forEach(function(p){ adicionarPonto(p); });
 
         trocarTab('tab-nova');
