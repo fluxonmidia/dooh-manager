@@ -2,43 +2,78 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DOOH Manager</title>
+  <title>Fluxon Delivery – Painel</title>
   <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
 
-<div class="header">
-  <div>
-    <h1>📺 DOOH Manager</h1>
-    <div class="subtitle">Gestão de Mídia Indoor</div>
+<header class="header header-home">
+  <div class="header-logo">
+    <!-- Logo Fluxon Mídia (versão branca simplificada) -->
+    <div class="logo-icon">
+      <svg viewBox="0 0 80 80" aria-hidden="true">
+        <!-- Triângulo play -->
+        <path d="M18 10 L18 70 L72 40 Z"
+              fill="none"
+              stroke="#FFFFFF"
+              stroke-width="4"
+              stroke-linejoin="round"
+              stroke-linecap="round"/>
+        <!-- Barras internas / prédios -->
+        <rect x="28" y="38" width="4" height="14" rx="1" fill="#FFFFFF" opacity="0.9"/>
+        <rect x="35" y="30" width="4" height="22" rx="1" fill="#FFFFFF" opacity="0.9"/>
+        <rect x="42" y="34" width="4" height="18" rx="1" fill="#FFFFFF" opacity="0.9"/>
+        <rect x="49" y="27" width="4" height="25" rx="1" fill="#FFFFFF" opacity="0.9"/>
+        <!-- Pontinhos -->
+        <circle cx="23" cy="20" r="1.4" fill="#FFFFFF" opacity="0.5"/>
+        <circle cx="29" cy="16" r="1.4" fill="#FFFFFF" opacity="0.5"/>
+        <circle cx="23" cy="26" r="1.4" fill="#FFFFFF" opacity="0.5"/>
+        <circle cx="30" cy="22" r="1.4" fill="#FFFFFF" opacity="0.4"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <div class="logo-title">Fluxon <span>Delivery</span></div>
+      <div class="logo-sub">Fluxon Mídia · Painel de operações</div>
+    </div>
   </div>
-</div>
+</header>
 
-<div class="container">
-  <div class="grid">
-    <div class="card-menu" onclick="location.href='cadastro.html'">
+<main class="container container-home">
+  <section class="card card-home-intro">
+    <h1>Painel Fluxon Delivery</h1>
+    <p>Escolha um dos módulos abaixo para continuar o fluxo de trabalho.</p>
+  </section>
+
+  <section class="grid">
+    <!-- Cadastro -->
+    <article class="card-menu" onclick="location.href='cadastro.html'">
       <div class="icone">🏪</div>
       <h2>Cadastro de Estabelecimento</h2>
-      <p>Cadastre um novo parceiro na plataforma</p>
-    </div>
-    <div class="card-menu" onclick="location.href='visita.html'">
+      <p>Cadastre novos parceiros e mantenha a base de pontos de exibição sempre atualizada.</p>
+    </article>
+
+    <!-- Visita técnica -->
+    <article class="card-menu" onclick="location.href='visita.html'">
       <div class="icone">🔍</div>
       <h2>Visita Técnica</h2>
-      <p>Registre a vistoria do local</p>
-    </div>
-    <div class="card-menu" onclick="location.href='conteudo.html'">
+      <p>Registre vistorias, pontos de instalação, infraestrutura e fotos do local.</p>
+    </article>
+
+    <!-- Conteúdo -->
+    <article class="card-menu" onclick="location.href='conteudo.html'">
       <div class="icone">🎨</div>
       <h2>Solicitação de Conteúdo</h2>
-      <p>Solicite criação ou atualização de conteúdo</p>
-    </div>
-    <div class="card-menu" onclick="location.href='chamado.html'">
+      <p>Centralize pedidos de criação ou atualização de peças para as telas.</p>
+    </article>
+
+    <!-- Chamado -->
+    <article class="card-menu" onclick="location.href='chamado.html'">
       <div class="icone">🔧</div>
       <h2>Chamado Técnico</h2>
-      <p>Registre problemas técnicos nas telas</p>
-    </div>
-  </div>
-</div>
+      <p>Registre e acompanhe problemas técnicos nas telas e players.</p>
+    </article>
+  </section>
+</main>
 
 </body>
 </html>
