@@ -290,6 +290,7 @@
   // ─── Abas ───────────────────────────────────────────────────
   document.querySelectorAll('.tab-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
+      console.log('Clique na aba:', this.dataset.tab);
       trocarTab(this.dataset.tab);
     });
   });
