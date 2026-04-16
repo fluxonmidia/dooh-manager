@@ -4,1039 +4,426 @@
   <meta charset="UTF-8">
   <title>Fluxon Delivery – Cadastro de Estabelecimento</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    /* RESET */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --roxo-escuro: #5B0F8C;
-      --roxo: #7B2FBE;
-      --roxo-medio: #9B59D6;
-      --roxo-claro: #F3F0F9;
-      --borda: #E0D6F5;
-      --texto: #1A1A2E;
-      --texto-sec: #5F5F7A;
-      --branco: #FFFFFF;
-      --verde: #2ECC71;
-      --vermelho: #E74C3C;
-    }
-
-    /* FUNDO GERAL */
-    body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: radial-gradient(circle at top left, #8e44ad 0, #5B0F8C 40%, #320b4c 100%);
-      color: var(--texto);
-      min-height: 100vh;
-      padding: 20px; /* Adicionado padding para o container não colar nas bordas */
-    }
-
-    /* CONTAINER PRINCIPAL */
-    .app-shell {
-      max-width: 900px;
-      margin: 0 auto;
-      background: linear-gradient(145deg, #F7F3FF, #F0ECFA);
-      border-radius: 24px;
-      box-shadow: 0 22px 45px rgba(20,0,40,0.35), 0 0 0 1px rgba(255,255,255,0.3);
-      overflow: hidden;
-    }
-
-    /* HEADER */
-    .page-header {
-      background: linear-gradient(135deg, var(--roxo-escuro), var(--roxo));
-      padding: 18px 24px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .btn-voltar {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.25);
-      color: white;
-      padding: 7px 14px;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: background 0.15s;
-    }
-    .btn-voltar:hover { background: rgba(255,255,255,0.25); }
-
-    .header-title {
-      flex: 1;
-    }
-    .header-title h1 {
-      color: white;
-      font-size: 1.15rem;
-      font-weight: 700;
-    }
-    .header-title p {
-      color: rgba(255,255,255,0.7);
-      font-size: 0.8rem;
-      margin-top: 2px;
-    }
-
-    /* TABS */
-    .tabs-bar {
-      background: rgba(255,255,255,0.6);
-      border-bottom: 1px solid var(--borda);
-      padding: 0 24px;
-      display: flex;
-      gap: 0;
-    }
-
-    .tab-btn {
-      background: none;
-      border: none;
-      border-bottom: 3px solid transparent;
-      padding: 14px 18px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--texto-sec);
-      cursor: pointer;
-      transition: color 0.15s, border-color 0.15s;
-    }
-    .tab-btn.active {
-      color: var(--roxo-escuro);
-      border-bottom-color: var(--roxo);
-      font-weight: 600;
-    }
-
-    /* EDIT BANNER */
-    .edit-banner {
-      display: none;
-      background: linear-gradient(90deg, #EDE1FF, #F3F0F9);
-      border-bottom: 1px solid var(--borda);
-      padding: 10px 24px;
-      align-items: center;
-      gap: 12px;
-      font-size: 0.83rem;
-      color: var(--roxo-escuro);
-    }
-    .edit-banner.visible { display: flex; }
-    .edit-banner strong { font-weight: 600; }
-    .btn-cancelar-edicao {
-      margin-left: auto;
-      background: none;
-      border: 1px solid var(--roxo-medio);
-      color: var(--roxo);
-      padding: 5px 12px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    .btn-cancelar-edicao:hover { background: rgba(123,47,190,0.08); }
-
-    /* CONTEÚDO */
-    .page-body {
-      padding: 24px;
-    }
-
-    /* SEÇÕES DO FORMULÁRIO */
-    .form-section {
-      background: white;
-      border-radius: var(--radius);
-      border: 1px solid var(--borda);
-      box-shadow: 0 4px 12px rgba(91,15,140,0.07);
-      margin-bottom: 18px;
-      overflow: hidden;
-    }
-
-    .form-section-header {
-      background: linear-gradient(90deg, #F3EEFF, #FAF7FF);
-      border-bottom: 1px solid var(--borda);
-      padding: 12px 18px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .section-icon {
-      width: 30px;
-      height: 30px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, var(--roxo), var(--roxo-escuro));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-      color: white;
-      box-shadow: 0 4px 10px rgba(91,15,140,0.3);
-      flex-shrink: 0;
-    }
-
-    .section-title {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--roxo-escuro);
-    }
-
-    .form-section-body {
-      padding: 18px;
-    }
-
-    /* GRID DE CAMPOS */
-    .form-row {
-      display: grid;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-    .form-row:last-child { margin-bottom: 0; }
-    .form-row.cols-1 { grid-template-columns: 1fr; }
-    .form-row.cols-2 { grid-template-columns: 1fr 1fr; }
-    .form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
-    .form-row.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
-    .form-row.cols-2-1 { grid-template-columns: 2fr 1fr; }
-    .form-row.cols-1-2 { grid-template-columns: 1fr 2fr; }
-    .form-row.cols-3-1 { grid-template-columns: 3fr 1fr; }
-
-    .form-group { display: flex; flex-direction: column; gap: 5px; }
-
-    .form-group label {
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--texto-sec);
-      letter-spacing: 0.01em;
-    }
-    .form-group label .req {
-      color: var(--roxo-medio);
-      margin-left: 2px;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      border: 1.5px solid var(--borda);
-      border-radius: 10px;
-      padding: 9px 12px;
-      font-size: 0.85rem;
-      color: var(--texto);
-      background: #FDFBFF;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-      font-family: inherit;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      border-color: var(--roxo-medio);
-      box-shadow: 0 0 0 3px rgba(123,47,190,0.12);
-      background: white;
-    }
-
-    .form-group textarea { resize: vertical; min-height: 72px; }
-
-    /* CHECKBOXES DE DIAS */
-    .days-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 4px;
-    }
-
-    .day-chip {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: #F3EEFF;
-      border: 1.5px solid var(--borda);
-      border-radius: 999px;
-      padding: 5px 12px;
-      cursor: pointer;
-      transition: all 0.12s;
-      font-size: 0.78rem;
-      color: var(--texto-sec);
-      user-select: none;
-    }
-    .day-chip input { display: none; }
-    .day-chip:has(input:checked) {
-      background: linear-gradient(135deg, var(--roxo), var(--roxo-escuro));
-      color: white;
-      border-color: var(--roxo-escuro);
-      box-shadow: 0 4px 10px rgba(91,15,140,0.3);
-    }
-
-    /* BOTÃO SALVAR */
-    .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 8px;
-    }
-
-    .btn-salvar {
-      background: linear-gradient(135deg, var(--roxo), var(--roxo-escuro));
-      color: white;
-      border: none;
-      padding: 12px 28px;
-      border-radius: 999px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 10px 22px rgba(91,15,140,0.4);
-      transition: transform 0.08s, box-shadow 0.08s, filter 0.08s;
-    }
-    .btn-salvar:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.05);
-      box-shadow: 0 14px 28px rgba(60,0,120,0.5);
-    }
-    .btn-salvar:active { transform: translateY(0); }
-
-    /* TABELA */
-    .table-toolbar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-    }
-
-    .search-input {
-      flex: 1;
-      min-width: 160px;
-      border: 1.5px solid var(--borda);
-      border-radius: 999px;
-      padding: 8px 14px;
-      font-size: 0.83rem;
-      outline: none;
-      background: white;
-      color: var(--texto);
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .search-input:focus {
-      border-color: var(--roxo-medio);
-      box-shadow: 0 0 0 3px rgba(123,47,190,0.12);
-    }
-
-    .table-wrap {
-      background: white;
-      border-radius: var(--radius);
-      border: 1px solid var(--borda);
-      box-shadow: 0 4px 12px rgba(91,15,140,0.07);
-      overflow: hidden;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.83rem;
-    }
-
-    thead tr {
-      background: linear-gradient(90deg, #F3EEFF, #FAF7FF);
-      border-bottom: 2px solid var(--borda);
-    }
-
-    thead th {
-      padding: 11px 14px;
-      text-align: left;
-      font-weight: 600;
-      color: var(--roxo-escuro);
-      font-size: 0.78rem;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-    }
-
-    tbody tr {
-      border-bottom: 1px solid #F0ECFA;
-      cursor: pointer;
-      transition: background 0.1s;
-    }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: #F9F5FF; }
-
-    tbody td {
-      padding: 11px 14px;
-      color: var(--texto);
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 999px;
-      font-size: 0.72rem;
-      font-weight: 600;
-    }
-    .badge-ativo   { background: #D5F5E3; color: #1a7a3c; }
-    .badge-lead    { background: #EDE1FF; color: #5B0F8C; }
-    .badge-negoc   { background: #FFF3CD; color: #856404; }
-    .badge-cancel  { background: #FDECEA; color: #9a1a1a; }
-    .badge-default { background: #F0F0F5; color: #5F5F7A; }
-
-    .table-hint {
-      text-align: center;
-      padding: 20px;
-      color: var(--texto-sec);
-      font-size: 0.8rem;
-    }
-
-    .tabela-dica {
-      font-size: 0.74rem;
-      color: var(--texto-sec);
-      text-align: center;
-      margin-top: 10px;
-    }
-
-    /* TOAST */
-    #toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: linear-gradient(135deg, var(--roxo), var(--roxo-escuro));
-      color: white;
-      padding: 12px 20px;
-      border-radius: 12px;
-      font-size: 0.85rem;
-      box-shadow: 0 8px 24px rgba(91,15,140,0.4);
-      opacity: 0;
-      transform: translateY(10px);
-      transition: opacity 0.25s, transform 0.25s;
-      pointer-events: none;
-      z-index: 9999;
-      max-width: 320px;
-    }
-    #toast.show { opacity: 1; transform: translateY(0); }
-    #toast.erro { background: linear-gradient(135deg, #c0392b, #922b21); }
-
-    @media (max-width: 600px) {
-      .form-row { flex-direction: column; }
-      .page-body { padding: 14px; }
-      .page-header { flex-wrap: wrap; gap: 10px; }
-    }
-  </style>
+  <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
 
-<div class="app-shell">
-
-  <!-- HEADER -->
-  <header class="page-header">
-    <a href="index.html" class="btn-voltar">← Voltar</a>
-    <div class="header-title">
-      <h1>Fluxon Delivery</h1>
-      <p>Cadastro de Estabelecimento</p>
+<header class="fd-header">
+  <div class="fd-header-inner">
+    <a href="index.html" class="fd-back">← Voltar</a>
+    <div class="fd-header-main">
+      <div class="fd-header-title">Cadastro de Estabelecimento</div>
+      <div class="fd-header-sub">Novo parceiro na plataforma Fluxon Delivery</div>
     </div>
-  </header>
+  </div>
+</header>
 
-  <!-- TABS -->
-  <div class="tabs-bar">
-    <button class="tab-btn active" id="tabNovo" onclick="mostrarAba('novo')">Novo Cadastro</button>
-    <button class="tab-btn" id="tabConsultar" onclick="mostrarAba('consultar')">Consultar / Editar</button>
+<main class="fd-shell">
+  <!-- Abas -->
+  <div class="fd-tabs">
+    <button class="fd-tab fd-tab-active" data-tab="novo">Novo Cadastro</button>
+    <button class="fd-tab" data-tab="consultar">Consultar / Editar</button>
   </div>
 
-  <!-- EDIT BANNER -->
-  <div class="edit-banner" id="editBanner">
-    <span>Editando: <strong><span id="nomeEditando"></span></strong> | ID: <strong><span id="idEditando"></span></strong></span>
-    <button class="btn-cancelar-edicao" onclick="cancelarEdicao()">✕ Cancelar edição</button>
+  <!-- Banner de edição -->
+  <div class="fd-edit-banner" id="editBanner" hidden>
+    <span>✏️ Editando: <strong id="nomeEditando"></strong> · ID: <strong id="idEditando"></strong></span>
+    <button class="fd-btn-chip" type="button" id="btnCancelarEdicao">✕ Cancelar edição</button>
   </div>
 
-  <!-- PAGE BODY -->
-  <div class="page-body">
-
-    <!-- ABA NOVO CADASTRO -->
-    <div id="abaNovo">
-      <!-- Dados do Estabelecimento -->
-      <div class="form-section">
-        <div class="form-section-header">
-          <div class="section-icon">📋</div>
-          <div class="section-title">Dados do Estabelecimento</div>
-        </div>
-        <div class="form-section-body">
-          <div class="form-row cols-2">
-            <div class="form-group">
-              <label>Nome Fantasia <span class="req">*</span></label>
-              <input type="text" id="nomeFantasia" placeholder="Nome comercial">
-            </div>
-            <div class="form-group">
-              <label>Razão Social</label>
-              <input type="text" id="razaoSocial" placeholder="Razão Social">
-            </div>
+  <!-- ABA NOVO -->
+  <section id="abaNovo">
+    <!-- Dados do Estabelecimento -->
+    <section class="fd-card">
+      <header class="fd-card-header">
+        <div class="fd-card-icon-mini">📋</div>
+        <h2>Dados do Estabelecimento</h2>
+      </header>
+      <div class="fd-card-body">
+        <div class="fd-row fd-row-2">
+          <div class="fd-field">
+            <label for="nomeFantasia">Nome Fantasia <span class="fd-req">*</span></label>
+            <input type="text" id="nomeFantasia" name="nomeFantasia" placeholder="Ex: Padaria Central">
           </div>
-          <div class="form-row cols-2">
-            <div class="form-group">
-              <label>CNPJ</label>
-              <input type="text" id="cnpj" placeholder="00.000.000/0000-00">
-            </div>
-            <div class="form-group">
-              <label>Segmento <span class="req">*</span></label>
-              <select id="segmento">
-                <option value="">Selecione...</option>
-                <option>Restaurante</option>
-                <option>Lanchonete / Fast Food</option>
-                <option>Padaria / Confeitaria</option>
-                <option>Bar / Pub</option>
-                <option>Salão de Beleza / Barbearia</option>
-                <option>Academia / Fitness</option>
-                <option>Clínica / Consultório</option>
-                <option>Farmácia</option>
-                <option>Supermercado / Mercado</option>
-                <option>Loja de Roupas / Calçados</option>
-                <option>Pet Shop</option>
-                <option>Escola / Curso</option>
-                <option>Hotel / Pousada</option>
-                <option>Outro</option>
-              </select>
-            </div>
+          <div class="fd-field">
+            <label for="cnpj">CNPJ</label>
+            <input type="text" id="cnpj" name="cnpj" placeholder="00.000.000/0000-00">
+          </div>
+        </div>
+        <div class="fd-row fd-row-2">
+          <div class="fd-field">
+            <label for="razaoSocial">Razão Social</label>
+            <input type="text" id="razaoSocial" name="razaoSocial" placeholder="Razão Social Ltda.">
+          </div>
+          <div class="fd-field">
+            <label for="segmento">Segmento <span class="fd-req">*</span></label>
+            <select id="segmento" name="segmento">
+              <option value="">Selecione...</option>
+              <option>Restaurante</option>
+              <option>Lanchonete / Fast Food</option>
+              <option>Padaria / Confeitaria</option>
+              <option>Bar / Pub</option>
+              <option>Salão de Beleza / Barbearia</option>
+              <option>Academia / Fitness</option>
+              <option>Clínica / Consultório</option>
+              <option>Farmácia</option>
+              <option>Supermercado / Mercado</option>
+              <option>Loja de Roupas / Calçados</option>
+              <option>Pet Shop</option>
+              <option>Escola / Curso</option>
+              <option>Hotel / Pousada</option>
+              <option>Outro</option>
+            </select>
           </div>
         </div>
       </div>
+    </section>
 
-      <!-- Endereço -->
-      <div class="form-section">
-        <div class="form-section-header">
-          <div class="section-icon">📍</div>
-          <div class="section-title">Endereço</div>
+    <!-- Endereço -->
+    <section class="fd-card">
+      <header class="fd-card-header">
+        <div class="fd-card-icon-mini">📍</div>
+        <h2>Endereço</h2>
+      </header>
+      <div class="fd-card-body">
+        <div class="fd-row fd-row-3">
+          <div class="fd-field">
+            <label for="cep">CEP <span class="fd-req">*</span></label>
+            <input type="text" id="cep" name="cep" placeholder="00000-000">
+          </div>
+          <div class="fd-field">
+            <label for="numero">Número <span class="fd-req">*</span></label>
+            <input type="text" id="numero" name="numero" placeholder="123">
+          </div>
+          <div class="fd-field">
+            <label for="logradouro">Logradouro <span class="fd-req">*</span></label>
+            <input type="text" id="logradouro" name="logradouro" placeholder="Rua, Avenida...">
+          </div>
         </div>
-        <div class="form-section-body">
-          <div class="form-row cols-4">
-            <div class="form-group">
-              <label>CEP <span class="req">*</span></label>
-              <input type="text" id="cep" placeholder="00000-000" maxlength="9">
-            </div>
-            <div class="form-group">
-              <label>Número <span class="req">*</span></label>
-              <input type="text" id="numero" placeholder="123">
-            </div>
-            <div class="form-group" style="grid-column: span 2">
-              <label>Logradouro <span class="req">*</span></label>
-              <input type="text" id="logradouro" placeholder="Rua, Avenida...">
-            </div>
+        <div class="fd-row fd-row-3">
+          <div class="fd-field">
+            <label for="complemento">Complemento</label>
+            <input type="text" id="complemento" name="complemento" placeholder="Sala, Andar...">
           </div>
-          <div class="form-row cols-3">
-            <div class="form-group">
-              <label>Complemento</label>
-              <input type="text" id="complemento" placeholder="Sala, Andar...">
-            </div>
-            <div class="form-group">
-              <label>Bairro <span class="req">*</span></label>
-              <input type="text" id="bairro" placeholder="Bairro">
-            </div>
-            <div class="form-group">
-              <label>Cidade <span class="req">*</span></label>
-              <input type="text" id="cidade" placeholder="Cidade">
-            </div>
+          <div class="fd-field">
+            <label for="bairro">Bairro <span class="fd-req">*</span></label>
+            <input type="text" id="bairro" name="bairro" placeholder="Bairro">
           </div>
-          <div class="form-row cols-2-1">
-            <div class="form-group">
-              <label>Ponto de Referência</label>
-              <input type="text" id="pontoReferencia" placeholder="Próximo a...">
-            </div>
-            <div class="form-group">
-              <label>Estado <span class="req">*</span></label>
-              <select id="estado">
-                <option value="">UF</option>
-                <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
-                <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
-                <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
-                <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
-                <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
-                <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
-                <option>SP</option><option>SE</option><option>TO</option>
-              </select>
-            </div>
+          <div class="fd-field">
+            <label for="cidade">Cidade <span class="fd-req">*</span></label>
+            <input type="text" id="cidade" name="cidade" placeholder="Cidade">
+          </div>
+        </div>
+        <div class="fd-row fd-row-2">
+          <div class="fd-field">
+            <label for="pontoReferencia">Ponto de Referência</label>
+            <input type="text" id="pontoReferencia" name="pontoReferencia" placeholder="Próximo a...">
+          </div>
+          <div class="fd-field">
+            <label for="estado">Estado <span class="fd-req">*</span></label>
+            <select id="estado" name="estado">
+              <option value="">UF</option>
+              <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+              <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+              <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+              <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+              <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+              <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+              <option>SP</option><option>SE</option><option>TO</option>
+            </select>
           </div>
         </div>
       </div>
+    </section>
 
-      <!-- Responsável -->
-      <div class="form-section">
-        <div class="form-section-header">
-          <div class="section-icon">👤</div>
-          <div class="section-title">Responsável</div>
-        </div>
-        <div class="form-section-body">
-          <div class="form-row cols-2">
-            <div class="form-group">
-              <label>Nome <span class="req">*</span></label>
-              <input type="text" id="nomeResponsavel" placeholder="Nome completo">
-            </div>
-            <div class="form-group">
-              <label>Cargo <span class="req">*</span></label>
-              <input type="text" id="cargoResponsavel" placeholder="Proprietário, Gerente...">
-            </div>
+    <!-- Responsável -->
+    <section class="fd-card">
+      <header class="fd-card-header">
+        <div class="fd-card-icon-mini">👤</div>
+        <h2>Responsável</h2>
+      </header>
+      <div class="fd-card-body">
+        <div class="fd-row fd-row-2">
+          <div class="fd-field">
+            <label for="nomeResponsavel">Nome <span class="fd-req">*</span></label>
+            <input type="text" id="nomeResponsavel" name="nomeResponsavel">
           </div>
-          <div class="form-row cols-2">
-            <div class="form-group">
-              <label>WhatsApp <span class="req">*</span></label>
-              <input type="text" id="whatsappResponsavel" placeholder="(00) 00000-0000">
-            </div>
-            <div class="form-group">
-              <label>Email</label>
-              <input type="email" id="emailResponsavel" placeholder="email@exemplo.com">
-            </div>
+          <div class="fd-field">
+            <label for="cargoResponsavel">Cargo <span class="fd-req">*</span></label>
+            <input type="text" id="cargoResponsavel" name="cargoResponsavel">
           </div>
         </div>
-      </div>
-
-      <!-- Contato Operacional -->
-      <div class="form-section">
-        <div class="form-section-header">
-          <div class="section-icon">👤</div>
-          <div class="section-title">Contato Operacional</div>
-        </div>
-        <div class="form-section-body">
-          <div class="form-row cols-1">
-            <div class="form-group">
-              <label>Contato Operacional Mesmo?</label>
-              <select id="contatoOpMesmo" onchange="toggleContatoOp()">
-                <option value="">Selecione...</option>
-                <option value="Sim">Sim</option>
-                <option value="Não, informar outro contato">Não, informar outro contato</option>
-              </select>
-            </div>
+        <div class="fd-row fd-row-2">
+          <div class="fd-field">
+            <label for="whatsappResponsavel">WhatsApp Responsável <span class="fd-req">*</span></label>
+            <input type="text" id="whatsappResponsavel" name="whatsappResponsavel" placeholder="(00) 00000-0000">
           </div>
-          <div id="camposContatoOp" style="display:none">
-            <div class="form-row cols-2">
-              <div class="form-group">
-                <label>Nome Contato Op.</label>
-                <input type="text" id="nomeContatoOp" placeholder="Nome">
-              </div>
-              <div class="form-group">
-                <label>Cargo Contato Op.</label>
-                <input type="text" id="cargoContatoOp" placeholder="Cargo">
-              </div>
-            </div>
-            <div class="form-row cols-2">
-              <div class="form-group">
-                <label>WhatsApp Contato Op.</label>
-                <input type="text" id="whatsappContatoOp" placeholder="(00) 00000-0000">
-              </div>
-              <div class="form-group">
-                <label>Email Contato Op.</label>
-                <input type="email" id="emailContatoOp" placeholder="email@exemplo.com">
-              </div..>
-            </div>
+          <div class="fd-field">
+            <label for="emailResponsavel">Email Responsável</label>
+            <input type="email" id="emailResponsavel" name="emailResponsavel" placeholder="email@exemplo.com">
           </div>
         </div>
       </div>
+    </section>
 
-      <!-- AÇÃO -->
-      <div class="form-actions">
-        <button class="btn-salvar" onclick="salvar()">
-          💾 Salvar Estabelecimento
-        </button>
+    <!-- Contato Operacional -->
+    <section class="fd-card">
+      <header class="fd-card-header">
+        <div class="fd-card-icon-mini">👤</div>
+        <h2>Contato Operacional</h2>
+      </header>
+      <div class="fd-card-body">
+        <div class="fd-row fd-row-1">
+          <div class="fd-field">
+            <label for="contatoOpMesmo">Contato Operacional Mesmo?</label>
+            <select id="contatoOpMesmo" name="contatoOpMesmo">
+              <option value="">Selecione...</option>
+              <option>Sim</option>
+              <option>Não, informar outro contato</option>
+            </select>
+          </div>
+        </div>
+        <div class="fd-row fd-row-2">
+          <div class="fd-field">
+            <label for="nomeContatoOp">Nome Contato Op.</label>
+            <input type="text" id="nomeContatoOp" name="nomeContatoOp">
+          </div>
+          <div class="fd-field">
+            <label for="cargoContatoOp">Cargo Contato Op.</label>
+            <input type="text" id="cargoContatoOp" name="cargoContatoOp">
+          </div>
+        </div>
+        <div class="fd-row fd-row-2">
+          <div class="fd-field">
+            <label for="whatsappContatoOp">WhatsApp Contato Op.</label>
+            <input type="text" id="whatsappContatoOp" name="whatsappContatoOp">
+          </div>
+          <div class="fd-field">
+            <label for="emailContatoOp">Email Contato Op.</label>
+            <input type="email" id="emailContatoOp" name="emailContatoOp">
+          </div>
+        </div>
       </div>
+    </section>
 
+    <!-- Funcionamento -->
+    <section class="fd-card">
+      <header class="fd-card-header">
+        <div class="fd-card-icon-mini">⏰</div>
+        <h2>Funcionamento</h2>
+      </header>
+      <div class="fd-card-body">
+        <div class="fd-field">
+          <label>Dias de Funcionamento</label>
+          <div class="fd-days">
+            <label><input type="checkbox" value="Segunda-feira"> Segunda-feira</label>
+            <label><input type="checkbox" value="Terça-feira"> Terça-feira</label>
+            <label><input type="checkbox" value="Quarta-feira"> Quarta-feira</label>
+            <label><input type="checkbox" value="Quinta-feira"> Quinta-feira</label>
+            <label><input type="checkbox" value="Sexta-feira"> Sexta-feira</label>
+            <label><input type="checkbox" value="Sábado"> Sábado</label>
+            <label><input type="checkbox" value="Domingo"> Domingo</label>
+          </div>
+        </div>
+        <div class="fd-row fd-row-3">
+          <div class="fd-field">
+            <label for="horarioAbertura">Horário Abertura</label>
+            <input type="time" id="horarioAbertura" name="horarioAbertura">
+          </div>
+          <div class="fd-field">
+            <label for="horarioFechamento">Horário Fechamento</label>
+            <input type="time" id="horarioFechamento" name="horarioFechamento">
+          </div>
+          <div class="fd-field">
+            <label for="feriados">Feriados</label>
+            <select id="feriados" name="feriados">
+              <option value="">Selecione...</option>
+              <option>Sim, normalmente</option>
+              <option>Sim, em horário reduzido</option>
+              <option>Não</option>
+              <option>Depende do feriado</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Perfil do Público -->
+    <section class="fd-card">
+      <header class="fd-card-header">
+        <div class="fd-card-icon-mini">📊</div>
+        <h2>Perfil do Público</h2>
+      </header>
+      <div class="fd-card-body">
+        <div class="fd-row fd-row-3">
+          <div class="fd-field">
+            <label for="perfilPublico">Perfil Público</label>
+            <select id="perfilPublico" name="perfilPublico">
+              <option value="">Selecione...</option>
+              <option>Classe A/B</option>
+              <option>Classe B/C</option>
+              <option>Classe C/D</option>
+              <option>Misto</option>
+            </select>
+          </div>
+          <div class="fd-field">
+            <label for="fluxoDiario">Fluxo Diário</label>
+            <select id="fluxoDiario" name="fluxoDiario">
+              <option value="">Selecione...</option>
+              <option>Até 50 pessoas</option>
+              <option>50 a 100 pessoas</option>
+              <option>100 a 300 pessoas</option>
+              <option>300 a 500 pessoas</option>
+              <option>Mais de 500 pessoas</option>
+            </select>
+          </div>
+          <div class="fd-field">
+            <label for="tempoPermanencia">Tempo Permanência</label>
+            <select id="tempoPermanencia" name="tempoPermanencia">
+              <option value="">Selecione...</option>
+              <option>Menos de 5 minutos</option>
+              <option>5 a 15 minutos</option>
+              <option>15 a 30 minutos</option>
+              <option>30 a 60 minutos</option>
+              <option>Mais de 1 hora</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Infraestrutura -->
+    <section class="fd-card">
+      <header class="fd-card-header">
+        <div class="fd-card-icon-mini">🔌</div>
+        <h2>Infraestrutura</h2>
+      </header>
+      <div class="fd-card-body">
+        <div class="fd-row fd-row-3">
+          <div class="fd-field">
+            <label for="internet">Internet</label>
+            <select id="internet" name="internet">
+              <option value="">Selecione...</option>
+              <option>Sim</option>
+              <option>Não</option>
+              <option>Não sei</option>
+            </select>
+          </div>
+          <div class="fd-field">
+            <label for="tipoConexao">Tipo Conexão</label>
+            <select id="tipoConexao" name="tipoConexao">
+              <option value="">Selecione...</option>
+              <option>Wi-Fi</option>
+              <option>Cabo (Ethernet)</option>
+              <option>Ambos</option>
+              <option>4G/5G</option>
+            </select>
+          </div>
+          <div class="fd-field">
+            <label for="energiaProxima">Energia Próxima</label>
+            <select id="energiaProxima" name="energiaProxima">
+              <option value="">Selecione...</option>
+              <option>Sim</option>
+              <option>Não</option>
+              <option>Não sei</option>
+            </select>
+          </div>
+        </div>
+        <div class="fd-field">
+          <label for="obsInfraestrutura">Obs Infraestrutura</label>
+          <textarea id="obsInfraestrutura" name="obsInfraestrutura"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- Prospecção -->
+    <section class="fd-card">
+      <header class="fd-card-header">
+        <div class="fd-card-icon-mini">📣</div>
+        <h2>Prospecção</h2>
+      </header>
+      <div class="fd-card-body">
+        <div class="fd-row fd-row-3">
+          <div class="fd-field">
+            <label for="comoChegou">Como Chegou</label>
+            <select id="comoChegou" name="comoChegou">
+              <option value="">Selecione...</option>
+              <option>Indicação</option>
+              <option>Prospecção ativa</option>
+              <option>Redes sociais</option>
+              <option>Google</option>
+              <option>Evento</option>
+              <option>Outro</option>
+            </select>
+          </div>
+          <div class="fd-field">
+            <label for="responsavelProspeccao">Responsável Prospecção</label>
+            <input type="text" id="responsavelProspeccao" name="responsavelProspeccao">
+          </div>
+          <div class="fd-field">
+            <label for="dataPrimeiroContato">Data Primeiro Contato</label>
+            <input type="date" id="dataPrimeiroContato" name="dataPrimeiroContato">
+          </div>
+        </div>
+        <div class="fd-row fd-row-2">
+          <div class="fd-field">
+            <label for="status">Status</label>
+            <select id="status" name="status">
+              <option value="">Selecione...</option>
+              <option>Lead</option>
+              <option>Em negociação</option>
+              <option>Contrato assinado</option>
+              <option>Instalado e ativo</option>
+              <option>Cancelado</option>
+              <option>Sem interesse</option>
+            </select>
+          </div>
+          <div class="fd-field">
+            <label for="observacoesGerais">Observações Gerais</label>
+            <textarea id="observacoesGerais" name="observacoesGerais"></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="fd-actions">
+      <button type="button" class="fd-btn-primary" id="btnSalvar">💾 Salvar Estabelecimento</button>
     </div>
-    <!-- fim abaNovo -->
+  </section>
 
-    <!-- ABA CONSULTAR -->
-    <div id="abaConsultar" style="display:none">
-      <div class="table-toolbar">
-        <input type="text" class="search-input" id="filtroNome"    placeholder="🔍 Filtrar por nome..."   oninput="filtrarTabela()">
-        <input type="text" class="search-input" id="filtroCidade"  placeholder="🏙 Filtrar por cidade..."  oninput="filtrarTabela()">
+  <!-- ABA CONSULTAR -->
+  <section id="abaConsultar" hidden>
+    <section class="fd-card">
+      <header class="fd-card-header">
+        <div class="fd-card-icon-mini">📚</div>
+        <h2>Estabelecimentos Cadastrados</h2>
+      </header>
+      <div class="fd-card-body">
+        <div class="fd-table-filters">
+          <input type="text" id="filtroNome"   placeholder="Filtrar por nome">
+          <input type="text" id="filtroCidade" placeholder="Filtrar por cidade">
+        </div>
+        <div class="fd-table-wrap">
+          <table class="fd-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome Fantasia</th>
+                <th>Cidade/UF</th>
+                <th>Segmento</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaEstabelecimentos">
+              <tr><td colspan="5" class="fd-table-empty">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="fd-table-hint">Clique em uma linha para editar.</p>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nome Fantasia</th>
-              <th>Cidade/UF</th>
-              <th>Segmento</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="tabelaEstabelecimentos">
-            <tr><td colspan="5" class="table-hint">Carregando...</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p style="font-size:0.75rem;color:var(--texto-sec);margin-top:10px;text-align:center;">
-        Clique em uma linha para editar.
-      </p>
-    </div>
-    <!-- fim abaConsultar -->
+    </section>
+  </section>
+</main>
 
-  </div>
-  <!-- fim page-body -->
-
-</div>
-<!-- fim app-shell -->
-
-<div id="toast"></div>
-
-<script>
-  const API_URL = 'SUA_URL_AQUI'; // Substitua pela URL real do seu Web App
-
-  let linhaEditando = null;
-  let todosEstabelecimentos = []; // Variável para armazenar todos os estabelecimentos
-
-  // ── FUNÇÕES DE MÁSCARA (MANTIDAS DO SEU CÓDIGO ORIGINAL) ──────────────────
-  document.addEventListener('DOMContentLoaded', function() {
-    // Máscara CNPJ
-    document.getElementById('cnpj').addEventListener('input', function(e) {
-      var value = e.target.value.replace(/\D/g, '');
-      if (value.length > 14) value = value.substring(0, 14);
-      if (value.length > 12) value = value.replace(/
-^
-(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})
-$
-/, '$1.$2.$3/$4-$5');
-      else if (value.length > 8) value = value.replace(/
-^
-(\d{2})(\d{3})(\d{3})(\d{4})
-$
-/, '$1.$2.$3/$4');
-      else if (value.length > 5) value = value.replace(/
-^
-(\d{2})(\d{3})(\d{3})
-$
-/, '$1.$2.$3');
-      else if (value.length > 2) value = value.replace(/
-^
-(\d{2})(\d{3})
-$
-/, '$1.$2');
-      else if (value.length > 0) value = value.replace(/
-^
-(\d{2})
-$
-/, '$1');
-      e.target.value = value;
-    });
-
-    // Máscara CEP
-    document.getElementById('cep').addEventListener('input', function(e) {
-      var value = e.target.value.replace(/\D/g, '');
-      if (value.length > 8) value = value.substring(0, 8);
-      if (value.length > 5) value = value.replace(/
-^
-(\d{5})(\d{3})
-$
-/, '$1-$2');
-      e.target.value = value;
-      if (value.length === 9) buscarCep(value);
-    });
-
-    // Máscara WhatsApp
-    document.getElementById('whatsappResponsavel').addEventListener('input', function(e) {
-      var value = e.target.value.replace(/\D/g, '');
-      if (value.length > 11) value = value.substring(0, 11);
-      if (value.length > 10) value = value.replace(/
-^
-(\d\d)(\d{5})(\d{4}).*/, '($1) $2-$3');
-      else if (value.length > 5) value = value.replace(/
-^
-(\d\d)(\d{4})(\d{0,4}).*/, '($1) $2-$3');
-      else if (value.length > 2) value = value.replace(/
-^
-(\d\d)(\d{0,5})/, '($1) $2');
-      else if (value.length > 0) value = value.replace(/
-^
-(\d*)/, '($1');
-      e.target.value = value;
-    });
-    document.getElementById('whatsappContatoOp').addEventListener('input', function(e) {
-      var value = e.target.value.replace(/\D/g, '');
-      if (value.length > 11) value = value.substring(0, 11);
-      if (value.length > 10) value = value.replace(/
-^
-(\d\d)(\d{5})(\d{4}).*/, '($1) $2-$3');
-      else if (value.length > 5) value = value.replace(/
-^
-(\d\d)(\d{4})(\d{0,4}).*/, '($1) $2-$3');
-      else if (value.length > 2) value = value.replace(/
-^
-(\d\d)(\d{0,5})/, '($1) $2');
-      else if (value.length > 0) value = value.replace(/
-^
-(\d*)/, '($1');
-      e.target.value = value;
-    });
-
-    // Inicializa a aba "Novo Cadastro" ao carregar a página
-    mostrarAba('novo');
-  });
-
-  // ── BUSCAR CEP ────────────────────────────────────
-  function buscarCep(cep) {
-    fetch('https://viacep.com.br/ws/' + cep + '/json/')
-      .then(function(r) { return r.json(); })
-      .then(function(d) {
-        if (d.erro) {
-          showToast('CEP não encontrado.', true);
-          document.getElementById('logradouro').value = '';
-          document.getElementById('bairro').value     = '';
-          document.getElementById('cidade').value     = '';
-          document.getElementById('estado').value     = '';
-          return;
-        }
-        document.getElementById('logradouro').value = d.logradouro || '';
-        document.getElementById('bairro').value     = d.bairro     || '';
-        document.getElementById('cidade').value     = d.localidade || '';
-        document.getElementById('estado').value     = d.uf         || '';
-      })
-      .catch(function() {
-        showToast('Erro ao buscar CEP.', true);
-      });
-  }
-
-  // ── TOGGLE CONTATO OP ─────────────────────────────
-  function toggleContatoOp() {
-    var v = document.getElementById('contatoOpMesmo').value;
-    document.getElementById('camposContatoOp').style.display =
-      v === 'Não, informar outro contato' ? '' : 'none';
-  }
-
-  // ── ABAS ──────────────────────────────────────────
-  function mostrarAba(aba) {
-    document.getElementById('abaNovo').style.display      = aba === 'novo'      ? 'block' : 'none';
-    document.getElementById('abaConsultar').style.display = aba === 'consultar' ? 'block' : 'none';
-    document.getElementById('tabNovo').classList.toggle('active',      aba === 'novo');
-    document.getElementById('tabConsultar').classList.toggle('active', aba === 'consultar');
-    if (aba === 'consultar') carregarEstabelecimentos();
-  }
-
-  // ── TOAST ─────────────────────────────────────────
-  function showToast(msg, erro) {
-    var t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'show' + (erro ? ' erro' : '');
-    clearTimeout(t._timer);
-    t._timer = setTimeout(function() { t.className = ''; }, 3500);
-  }
-
-  // ── DIAS DA SEMANA ────────────────────────────────
-  function getDias() {
-    return ['seg','ter','qua','qui','sex','sab','dom']
-      .filter(function(id) { return document.getElementById(id).checked; })
-      .map(function(id)    { return document.getElementById(id).value;   })
-      .join(', ');
-  }
-
-  function setDias(str) {
-    var dias = (str || '').split(',').map(function(d) { return d.trim(); });
-    ['seg','ter','qua','qui','sex','sab','dom'].forEach(function(id) {
-      document.getElementById(id).checked =
-        dias.indexOf(document.getElementById(id).value) > -1;
-    });
-  }
-
-  // ── BADGE STATUS ──────────────────────────────────
-  function badgeStatus(s) {
-    var m = {
-      'Instalado e ativo': 'badge-ativo',
-      'Lead':              'badge-lead',
-      'Em negociação':     'badge-negoc',
-      'Cancelado':         'badge-cancel',
-      'Sem interesse':     'badge-cancel'
-    };
-    return '<span class="badge ' + (m[s] || 'badge-default') + '">' + (s || '—') + '</span>';
-  }
-
-  // ── SALVAR ────────────────────────────────────────
-  function salvar() {
-    var nome = document.getElementById('nomeFantasia').value.trim();
-    if (!nome) { showToast('⚠️ Nome Fantasia é obrigatório.', true); return; }
-
-    var dados = {
-      acao: linhaEditando ? 'atualizarEstabelecimento' : 'salvarEstabelecimento',
-      linha: linhaEditando,
-      nomeFantasia:          nome,
-      razaoSocial:           document.getElementById('razaoSocial').value.trim(),
-      cnpj:                  document.getElementById('cnpj').value.trim(),
-      segmento:              document.getElementById('segmento').value,
-      cep:                   document.getElementById('cep').value.trim(),
-      logradouro:            document.getElementById('logradouro').value.trim(),
-      numero:                document.getElementById('numero').value.trim(),
-      complemento:           document.getElementById('complemento').value.trim(),
-      bairro:                document.getElementById('bairro').value.trim(),
-      cidade:                document.getElementById('cidade').value.trim(),
-      estado:                document.getElementById('estado').value,
-      pontoReferencia:       document.getElementById('pontoReferencia').value.trim(),
-      nomeResponsavel:       document.getElementById('nomeResponsavel').value.trim(),
-      cargoResponsavel:      document.getElementById('cargoResponsavel').value.trim(),
-      whatsappResponsavel:   document.getElementById('whatsappResponsavel').value.trim(),
-      emailResponsavel:      document.getElementById('emailResponsavel').value.trim(),
-      contatoOpMesmo:        document.getElementById('contatoOpMesmo').value,
-      nomeContatoOp:         document.getElementById('nomeContatoOp').value.trim(),
-      cargoContatoOp:        document.getElementById('cargoContatoOp').value.trim(),
-      whatsappContatoOp:     document.getElementById('whatsappContatoOp').value.trim(),
-      emailContatoOp:        document.getElementById('emailContatoOp').value.trim(),
-      diasFuncionamento:     getDias(),
-      horarioAbertura:       document.getElementById('horarioAbertura').value,
-      horarioFechamento:     document.getElementById('horarioFechamento').value,
-      feriados:              document.getElementById('feriados').value,
-      perfilPublico:         document.getElementById('perfilPublico').value,
-      fluxoDiario:           document.getElementById('fluxoDiario').value,
-      tempoPermanencia:      document.getElementById('tempoPermanencia').value,
-      internet:              document.getElementById('internet').value,
-      tipoConexao:           document.getElementById('tipoConexao').value,
-      energiaProxima:        document.getElementById('energiaProxima').value,
-      obsInfraestrutura:     document.getElementById('obsInfraestrutura').value.trim(),
-      comoChegou:            document.getElementById('comoChegou').value,
-      responsavelProspeccao: document.getElementById('responsavelProspeccao').value.trim(),
-      dataPrimeiroContato:   document.getElementById('dataPrimeiroContato').value,
-      status:                document.getElementById('status').value,
-      observacoesGerais:     document.getElementById('observacoesGerais').value.trim()
-    };
-
-    document.getElementById('btnSalvar').disabled = true;
-    document.getElementById('btnSalvar').innerHTML = '💾 <span class="loading"></span> Salvando...'; // Adiciona loading
-
-    fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify(dados)
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(res) {
-      if (res.sucesso) {
-        showToast(res.mensagem || '✅ Salvo com sucesso!');
-        limparFormulario();
-        cancelarEdicao();
-      } else {
-        showToast('Erro: ' + res.mensagem, true);
-      }
-    })
-    .catch(function(e) { showToast('Erro de conexão: ' + e, true); })
-    .finally(function() {
-      document.getElementById('btnSalvar').disabled = false;
-      document.getElementById('btnSalvar').innerHTML = '💾 Salvar Estabelecimento';
-    });
-  }
-
-  // ── LIMPAR ────────────────────────────────────────
-  function limparFormulario() {
-    ['nomeFantasia','razaoSocial','cnpj','cep','logradouro','numero','complemento',
-     'bairro','cidade','pontoReferencia','nomeResponsavel','cargoResponsavel',
-     'whatsappResponsavel','emailResponsavel','nomeContatoOp','cargoContatoOp',
-     'whatsappContatoOp','emailContatoOp','horarioAbertura','horarioFechamento',
-     'obsInfraestrutura','responsavelProspeccao','dataPrimeiroContato','observacoesGerais'
-    ].forEach(function(id) { document.getElementById(id).value = ''; });
-
-    ['segmento','estado','contatoOpMesmo','feriados','perfilPublico',
-     'fluxoDiario','tempoPermanencia','internet','tipoConexao','energiaProxima',
-     'comoChegou','status'
-    ].forEach(function(id) { document.getElementById(id).selectedIndex = 0; });
-
-    setDias('');
-    document.getElementById('camposContatoOp').style.display = 'none';
-  }
-
-  // ── CANCELAR EDIÇÃO ───────────────────────────────
-  function cancelarEdicao() {
-    linhaEditando = null;
-    document.getElementById('editBanner').classList.remove('visible');
-    limparFormulario();
-  }
-
-  // ── CARREGAR TABELA ───────────────────────────────
-  function carregarEstabelecimentos() {
-    var tbody = document.getElementById('tabelaEstabelecimentos');
-    tbody.innerHTML = '<tr><td colspan="5" class="table-hint">Carregando...</td></tr>';
-
-    fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({ acao: 'listarEstabelecimentos' })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(res) {
-      todosEstabelecimentos = res.estabelecimentos || [];
-      renderTabela(todosEstabelecimentos);
-    })
-    .catch(function(e) {
-      tbody.innerHTML = '<tr><td colspan="5" class="table-hint">Erro ao carregar.</td></tr>';
-      showToast('Erro ao carregar estabelecimentos: ' + e.message, true);
-    });
-  }
-
-  function renderTabela(lista) {
-    var tbody = document.getElementById('tabelaEstabelecimentos');
-    if (!lista.length) {
-      tbody.innerHTML = '<tr><td colspan="5" class="table-hint">Nenhum cadastro encontrado.</td></tr>';
-      return;
-    }
-    tbody.innerHTML = lista.map(function(e) {
-      return '<tr onclick="editarEstabelecimento(' + e.linha + ',\'' +
-        (e.nome || '').replace(/'/g,"&#39;") + '\')">' +
-        '<td>' + (e.id || '—') + '</td>' +
-        '<td>' + (e.nome || '—') + '</td>' +
-        '<td>' + (e.cidade || '—') + (e.estado ? '/' + e.estado : '') + '</td>' +
-        '<td>' + (e.segmento || '—') + '</td>' +
-        '<td>' + badgeStatus(e.status) + '</td>' +
-        '</tr>';
-    }).join('');
-  }
-
-  function filtrarTabela() {
-    var nome   = document.getElementById('filtroNome').value.toLowerCase();
-    var cidade = document.getElementById('filtroCidade').value.toLowerCase();
-    var filtrado = todosEstabelecimentos.filter(function(e) {
-      return (!nome   || (e.nome   || '').toLowerCase().includes(nome)) &&
-             (!cidade || (e.cidade || '').toLowerCase().includes(cidade));
-    });
-    renderTabela(filtrado);
-  }
-
-  // ── EDITAR ────────────────────────────────────────
-  function editarEstabelecimento(linha, nome) {
-    fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({ acao: 'buscarEstabelecimento', linha: linha })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-      if (!d.sucesso) { showToast('Erro ao buscar.', true); return; }
-
-      linhaEditando = linha;
-
-      document.getElementById('nomeFantasia').value          = d['Nome Fantasia'] || '';
-      document.getElementById('razaoSocial').value           = d['Razao Social'] || '';
-      document.getElementById('cnpj').value                  = d['CNPJ'] || '';
-      document.getElementById('segmento').value              = d['Segmento'] || '';
-      document.getElementById('cep').value                   = d['CEP'] || '';
-      document.getElementById('logradouro').value            = d['Logradouro'] || '';
-      document.getElementById('numero').value                = d['Numero'] || '';
-      document.getElementById('complemento').value           = d['Complemento'] || '';
-      document.getElementById('bairro').value                = d['Bairro'] || '';
-      document.getElementById('cidade').value                = d['Cidade'] || '';
-      document.getElementById('estado').value                = d['Estado'] || '';
-      document.getElementById('pontoReferencia').value       = d['Ponto de Referencia'] || '';
-      document.getElementById('nomeResponsavel').value       = d['Nome Responsavel'] || '';
-      document.getElementById('cargoResponsavel').value      = d['Cargo Responsavel'] || '';
-      document.getElementById('whatsappResponsavel').value   = d['WhatsApp Responsavel'] || '';
-      document.getElementById('emailResponsavel').value      = d['Email Responsavel'] || '';
-      document.getElementById('contatoOpMesmo').value        = d['Contato Operacional Mesmo?'] || '';
-      document.getElementById('nomeContatoOp').value         = d['Nome Contato Op.'] || '';
-      document.getElementById('cargoContatoOp').value        = d['Cargo Contato Op.'] || '';
-      document.getElementById('whatsappContatoOp').value     = d['WhatsApp Contato Op.'] || '';
-      document.getElementById('emailContatoOp').value        = d['Email Contato Op.'] || '';
-      document.getElementById('horarioAbertura').value       = d['Horario Abertura'] || '';
-      document.getElementById('horarioFechamento').value     = d['Horario Fechamento'] || '';
-      document.getElementById('feriados').value              = d['Feriados'] || '';
-      document.getElementById('perfilPublico').value         = d['Perfil Publico'] || '';
-      document.getElementById('fluxoDiario').value           = d['Fluxo Diario'] || '';
-      document.getElementById('tempoPermanencia').value      = d['Tempo Permanencia'] || '';
-      document.getElementById('internet').value              = d['Internet'] || '';
-      document.getElementById('tipoConexao').value           = d['Tipo Conexao'] || '';
-      document.getElementById('energiaProxima').value        = d['Energia Proxima'] || '';
-      document.getElementById('obsInfraestrutura').value     = d['Obs Infraestrutura'] || '';
-      document.getElementById('comoChegou').value            = d['Como Chegou'] || '';
-      document.getElementById('responsavelProspeccao').value = d['Responsavel Prospeccao'] || '';
-      document.getElementById('dataPrimeiroContato').value   = d['Data Primeiro Contato'] || '';
-      document.getElementById('status').value                = d['Status'] || '';
-      document.getElementById('observacoesGerais').value     = d['Observacoes Gerais'] || '';
-
-      setDias(d['Dias Funcionamento'] || '');
-      toggleContatoOp();
-
-      document.getElementById('nomeEditando').textContent = nome;
-      document.getElementById('idEditando').textContent   = d['ID'] || '';
-      document.getElementById('editBanner').classList.add('visible');
-
-      mostrarAba('novo');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    })
-    .catch(function(e) { showToast('Erro: ' + e, true); });
-  }
-</script>
 </body>
 </html>
